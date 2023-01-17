@@ -1,7 +1,8 @@
 const AWS = require('aws-sdk')
 const { Client, LocalAuth } = require('whatsapp-web.js')
-const qrcode = require('qrcode-terminal')
+const qrcode = require('qrcode')
 const dotenv = require('dotenv')
+const fs = require('fs');
 const { getEnv } = require('./utils')
 
 dotenv.config()
@@ -15,16 +16,16 @@ const client = new Client({
 
 const s3 = new AWS.S3()
 const QR_BUCKET_NAME = getEnv('QR_BUCKET_NAME')
-
 client.on('qr', async (qr) => {
-  qrcode.generate(qr, { small: true }, async (qrcode) => {
-    const params = {
-      Bucket: QR_BUCKET_NAME,
-      Key: 'qr.txt',
-      Body: qrcode
-    }
-    console.info('Uploading QR code to S3')
-    await s3.putObject(params).promise()
+  await qrcode.toFile("./file.png", qr, async (qrcode) => {
+  const qrImageFile = fs.createReadStream('./file.png');
+  const params = {
+    Bucket: QR_BUCKET_NAME,
+    Key: 'qr.png',
+    Body: qrImageFile
+  }
+  await s3.upload(params).promise()
+  console.info('Uploaded QR code to S3')
   })
 })
 
