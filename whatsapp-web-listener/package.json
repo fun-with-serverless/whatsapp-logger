@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --fix",
-    "test": "jest"
+    "test": "jest",
+    "prettier": "prettier --write \"src/**/*.js\"",
+    "run-local": "bash ../scripts/run_whatsapp_listener_locally.sh"
   },
   "repository": {
     "type": "git",
@@ -25,7 +27,11 @@
   "dependencies": {
     "aws-sdk": "^2.1290.0",
     "dotenv": "^16.0.3",
+    "fs-extra": "^11.1.0",
+    "pino": "^8.8.0",
     "qrcode": "^1.5.1",
+    "randomstring": "^1.2.3",
+    "set-interval-async": "^3.0.3",
     "whatsapp-web.js": "^1.18.4"
   },
   "devDependencies": {
@@ -35,6 +41,7 @@
     "eslint-plugin-n": "^15.6.0",
     "eslint-plugin-promise": "^6.1.1",
     "husky": "^8.0.3",
-    "jest": "^29.3.1"
+    "jest": "^29.3.1",
+    "prettier": "^2.8.3"
   }
 }
