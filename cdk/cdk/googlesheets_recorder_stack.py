@@ -5,6 +5,8 @@ from aws_cdk import (
     aws_sns as sns,
     aws_sns_subscriptions as subscriptions,
     aws_sqs as sqs,
+    aws_lambda_python_alpha as lambda_python,
+    aws_lambda as _lambda,
     CfnOutput,
 )
 from constructs import Construct
