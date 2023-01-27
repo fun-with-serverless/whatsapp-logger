@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Used by whatsapp-web-listener project to run the container locally. Don't run this script directly, instead use "npm run run-local"
 # Extract the credentials from the file
 access_key=$(grep aws_access_key_id ~/.aws/credentials | awk -F " = " '{print $2}')
 secret_key=$(grep aws_secret_access_key ~/.aws/credentials | awk -F " = " '{print $2}')
