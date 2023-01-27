@@ -5,11 +5,15 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_s3 as s3,
     aws_secretsmanager as secretmanager,
-    CfnOutput
+    CfnOutput,
 )
 
 
 class QRViewer(Stack):
+    @property
+    def lambda_url(self) -> str:
+        return f"{self._url.url}qr-code"
+
     def __init__(
         self, scope: Construct, id: str, qr_bucket: s3.Bucket, **kwargs
     ) -> None:
@@ -28,12 +32,20 @@ class QRViewer(Stack):
                 "SECRETAUTH_PARAM_NAME": secret.secret_name,
                 "QR_FILE_PATH": "qr.png",
             },
-            layers=[_lambda.LayerVersion.from_layer_version_arn(self, "PowerTools", layer_version_arn=f"arn:aws:lambda:{self.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:18")]
+            layers=[
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self,
+                    "PowerTools",
+                    layer_version_arn=f"arn:aws:lambda:{self.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:18",
+                )
+            ],
         )
 
-        url = qr_lambda.add_function_url(auth_type=_lambda.FunctionUrlAuthType.NONE)
+        self._url = qr_lambda.add_function_url(
+            auth_type=_lambda.FunctionUrlAuthType.NONE
+        )
 
         qr_bucket.grant_read(qr_lambda)
         secret.grant_read(qr_lambda)
-        
-        CfnOutput(self, "GetQRUrl", value=f"${url.url}qr-code")
+
+        CfnOutput(self, "GetQRUrl", value=self.lambda_url)

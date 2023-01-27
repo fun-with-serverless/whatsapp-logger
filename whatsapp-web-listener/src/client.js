@@ -17,11 +17,11 @@ class WhatsAppClient {
   }
 
   async startListening() {
-
     this.qrBucketName = getEnv("QR_BUCKET_NAME");
     this.sendMailTo = getEnv("SEND_QR_TO");
     this.sendMessageToSNSARN = getEnv("WHATAPP_SNS_TOPIC_ARN");
     this.efsPath = getEnv("PERSISTANCE_STORAGE_MOUNT_POINT");
+    this.linkUrl = getEnv("URL_IN_MAIL");
 
     try {
       await fs.ensureDir(`${this.efsPath}/local_auth`, 775);
@@ -59,13 +59,23 @@ class WhatsAppClient {
       await this.s3.upload(params).promise();
       pino.info("Uploaded QR code");
       if (this.intervalId === null) {
-        await this.asyncSendMail(this.ses, this.sendMailTo, this.sendMailTo);
+        await this.asyncSendMail(
+          this.ses,
+          this.sendMailTo,
+          this.sendMailTo,
+          this.linkUrl
+        );
+        this.intervalId = setIntervalAsync(async () => {
+          await this.asyncSendMail(
+            this.ses,
+            this.sendMailTo,
+            this.sendMailTo,
+            this.linkUrl
+          );
+        }, ONE_HOUR);
       } else {
         pino.info("Email sent, skipping");
       }
-      this.intervalId = setIntervalAsync(async () => {
-        await this.asyncSendMail(this.ses, this.sendMailTo, this.sendMailTo);
-      }, ONE_HOUR);
     });
   }
 

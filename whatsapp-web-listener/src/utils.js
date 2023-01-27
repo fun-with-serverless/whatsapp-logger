@@ -18,7 +18,7 @@ const sendEmail = async (ses, source, to, imageUrl) => {
           Charset: "UTF-8",
           Data: `<html>
             <body>
-              <p>Please approve the QR code <a href='${imageUrl}'>by scanning this image</a></p>
+              <p>Please approve the QR code <a href="${imageUrl}">by scanning this image</a></p>
             </body>
           </html>`,
         },

@@ -1,6 +1,10 @@
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
-from aws_lambda_powertools.event_handler import LambdaFunctionUrlResolver, Response, content_types
+from aws_lambda_powertools.event_handler import (
+    LambdaFunctionUrlResolver,
+    Response,
+    content_types,
+)
 from aws_lambda_powertools.utilities import parameters
 from aws_lambda_powertools.event_handler.exceptions import (
     UnauthorizedError,
@@ -85,7 +89,7 @@ AUTH_HTML_TEMPLATE = """
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://ocn5dioauoo5u647nic42yoje40zmnxg.lambda-url.us-east-1.on.aws/qr_code", true);
+    xhr.open("GET", window.location.href, true);
     xhr.setRequestHeader("Authorization", "Basic " + btoa(username + ":" + password));
     xhr.responseType = "blob";
     xhr.onload = function () {
@@ -113,9 +117,7 @@ app = LambdaFunctionUrlResolver()
 
 @app.get("/qr-code")
 def get_qr_code():
-    encoded_auth = app.current_event.get_header_value(
-        name="authorization"
-    )
+    encoded_auth = app.current_event.get_header_value(name="authorization")
     logger.info(app.current_event.headers)
     if encoded_auth and encoded_auth.startswith("Basic"):
         logger.info("Basic auth arrived", auth_details=encoded_auth)
