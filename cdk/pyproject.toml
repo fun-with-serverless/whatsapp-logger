@@ -5,12 +5,29 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
+[tool.poe.tasks]
+black = "black app.py cdk/*.py"
+lint = "ruff app.py cdk/*.py"
+
+
+[tool.poe.tasks.deploy]
+cmd = "cdk deploy --all -c email_identity=$email_identity"
+args = [{ name = "email_identity", required = true, help = "SES email" }]
+
+[tool.poe.tasks.destroy]
+cmd = "cdk destroy --all -c email_identity=$email_identity"
+args = [{ name = "email_identity", required = true, help = "SES email" }]
+
+[tool.ruff]
+line-length = 88
+
 [tool.poetry.dependencies]
 python = "^3.9"
 aws-cdk-lib = "^2.62.1"
 constructs = ">=10.0.0,<11.0.0"
 black = "^22.12.0"
 aws-cdk-aws-lambda-python-alpha = "^2.62.1a0"
+ruff = "^0.0.239"
 
 
 [build-system]

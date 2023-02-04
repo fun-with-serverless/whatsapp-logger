@@ -1,19 +1,21 @@
 [tool.poetry]
-name = "qr-viewer"
+name = "googlesheets-recorder"
 version = "0.1.0"
 description = ""
-authors = ["Efi MK"]
+authors = ["Efi Merdler-Kravitz"]
 readme = "README.md"
-packages = [{include = "qr_viewer"}]
+packages = [{include = "googlesheets_recorder"}]
 
 [tool.poe.tasks]
-black = "black src/app.py"
-lint = "ruff src/app.py"
+black = "black app.py cdk/*.py"
+lint = "ruff app.py cdk/*.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
 boto3 = "^1.26.59"
-ruff = "^0.0.241"
+pyproject-flake8 = "^6.0.0.post1"
+dacite = "^1.8.0"
+gspread = "^5.7.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"

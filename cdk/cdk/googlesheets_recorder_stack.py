@@ -8,8 +8,11 @@ from aws_cdk import (
     aws_lambda_python_alpha as lambda_python,
     aws_lambda as _lambda,
     CfnOutput,
+    aws_secretsmanager as secretmanager,
+    aws_ssm as ssm,
+    Duration,
+    aws_lambda_event_sources as event_sources,
 )
-from constructs import Construct
 
 
 class GoogleSheetsRecorder(Stack):
@@ -20,11 +23,48 @@ class GoogleSheetsRecorder(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        sheets_recorder_queue = sqs.Queue(self, "sheets-recorder", fifo=True)
-        whatsapp_messages = sns.Topic(self, "whatsapp-messages", fifo=True)
+        dlq = sqs.Queue(self, "sheets-recorder-dlq", visibility_timeout=Duration.seconds(300))
+
+        sheets_recorder_queue = sqs.Queue(
+            self, "sheets-recorder", visibility_timeout=Duration.minutes(2), dead_letter_queue = sqs.DeadLetterQueue(queue=dlq, max_receive_count=5)
+        )
+        whatsapp_messages = sns.Topic(self, "whatsapp-messages")
         whatsapp_messages.add_subscription(
             subscriptions.SqsSubscription(sheets_recorder_queue)
         )
         self._whatsapp_messages = whatsapp_messages
+
+        google_credentials = secretmanager.Secret(self, "GoogleCredentials")
+        sheet_url = ssm.StringParameter(
+            self, "GoogleSheetUrl", string_value="Placeholder"
+        )
+        sheets_recorder = lambda_python.PythonFunction(
+            self,
+            "GoogleSheetRectoder",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            entry="../googlesheets-recorder",
+            index="src/app.py",
+            timeout=Duration.minutes(1),
+            environment={
+                "GOOGLE_SECRET_AUTH_NAME": google_credentials.secret_name,
+                "GOOGLE_SHEET_URL": sheet_url.parameter_name,
+            },
+            layers=[
+                _lambda.LayerVersion.from_layer_version_arn(
+                    self,
+                    "PowerTools",
+                    layer_version_arn=f"arn:aws:lambda:{self.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:18",
+                )
+            ],
+        )
+
+        google_credentials.grant_read(sheets_recorder)
+        sheet_url.grant_read(sheets_recorder)
+
+        sheets_recorder.add_event_source(
+            event_sources.SqsEventSource(
+                sheets_recorder_queue, report_batch_item_failures=True
+            )
+        )
 
         CfnOutput(self, "WhatsAppMessagesSns", value=whatsapp_messages.topic_arn)

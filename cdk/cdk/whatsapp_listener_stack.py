@@ -8,9 +8,6 @@ from aws_cdk import (
     aws_efs as efs,
     RemovalPolicy,
     aws_ses as ses,
-    aws_s3 as s3,
-    CfnOutput,
-    Duration,
 )
 from constructs import Construct
 
@@ -123,7 +120,7 @@ class WhatsAppListener(Stack):
         ses.EmailIdentity(
             self, "QRCodeIdentity", identity=ses.Identity.email(email_identity)
         )
-        
+
         return email_identity
 
     def _create_security_group(self, vpc: ec2.Vpc) -> ec2.SecurityGroup:

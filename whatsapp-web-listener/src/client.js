@@ -90,28 +90,25 @@ class WhatsAppClient {
     if (this.intervalId !== null) {
       clearIntervalAsync(this.intervalId);
     }
-    pino.log("Client is ready!");
+    pino.info("Client is ready!");
   }
 
   async onMessage(message) {
     try {
       const chat = await message.getChat();
-      const date = new Date(message.timestamp * 1000);
+      const contact = await message.getContact();
       message = {
-        groupName: chat.name,
-        isoDate: date.toISOString(),
-        author: message.author || null,
-        body: message.body,
+        group_name: chat.name,
+        group_id: chat.id.user,
+        time: message.timestamp,
+        participant_id: contact.id.user,
+        participant_handle: contact.pushname,
+        participant_number: contact.number,
+        participant_contact_name: contact.name,
+        message: message.body,
       };
-      if (chat.isGroup) {
-        pino.log(
-          `[${chat.name}]${date.toISOString()}:${message.author}:${
-            message.body
-          }`
-        );
-      } else {
-        pino.log(`[${chat.name}]${date.toISOString()}:${message.body}`);
-      }
+
+      pino.info(message);
 
       await this.sns
         .publish({

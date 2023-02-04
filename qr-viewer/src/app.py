@@ -13,7 +13,6 @@ import base64
 from http import HTTPStatus
 import boto3
 import os
-from aws_lambda_powertools.utilities import parameters
 
 s3 = boto3.client("s3")
 
