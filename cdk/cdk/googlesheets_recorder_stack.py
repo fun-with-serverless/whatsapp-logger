@@ -64,7 +64,7 @@ class GoogleSheetsRecorder(Stack):
                 prepare_layer(
                     self,
                     layer_name="GoogleSheetRecorderLocalReq",
-                    poetry_dir="../googlesheets-recorder, ",
+                    poetry_dir="../googlesheets-recorder",
                 ),
             ],
         )
