@@ -15,8 +15,6 @@ from aws_cdk import (
     aws_lambda_event_sources as event_sources,
 )
 
-import os
-import subprocess
 
 class GoogleSheetsRecorder(Stack):
     @property
@@ -26,10 +24,15 @@ class GoogleSheetsRecorder(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        dlq = sqs.Queue(self, "sheets-recorder-dlq", visibility_timeout=Duration.seconds(300))
+        dlq = sqs.Queue(
+            self, "sheets-recorder-dlq", visibility_timeout=Duration.seconds(300)
+        )
 
         sheets_recorder_queue = sqs.Queue(
-            self, "sheets-recorder", visibility_timeout=Duration.minutes(2), dead_letter_queue = sqs.DeadLetterQueue(queue=dlq, max_receive_count=5)
+            self,
+            "sheets-recorder",
+            visibility_timeout=Duration.minutes(2),
+            dead_letter_queue=sqs.DeadLetterQueue(queue=dlq, max_receive_count=5),
         )
         whatsapp_messages = sns.Topic(self, "whatsapp-messages")
         whatsapp_messages.add_subscription(
@@ -58,8 +61,11 @@ class GoogleSheetsRecorder(Stack):
                     "PowerTools",
                     layer_version_arn=f"arn:aws:lambda:{self.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:18",
                 ),
-                prepare_layer(self, layer_name="GoogleSheetRecorderLocalReq", poetry_dir="../googlesheets-recorder, ")
-                
+                prepare_layer(
+                    self,
+                    layer_name="GoogleSheetRecorderLocalReq",
+                    poetry_dir="../googlesheets-recorder, ",
+                ),
             ],
         )
 
@@ -73,7 +79,3 @@ class GoogleSheetsRecorder(Stack):
         )
 
         CfnOutput(self, "WhatsAppMessagesSns", value=whatsapp_messages.topic_arn)
-        
-    
-
-        
