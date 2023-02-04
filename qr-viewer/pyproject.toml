@@ -12,12 +12,14 @@ lint = "ruff src/app.py"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+
+[tool.poetry.group.layer.dependencies]
 boto3 = "^1.26.59"
-ruff = "^0.0.241"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
 aws-lambda-powertools = {extras = ["aws-sdk"], version = "^2.7.0"}
+ruff = "^0.0.241"
 
 [build-system]
 requires = ["poetry-core"]

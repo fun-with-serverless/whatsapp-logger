@@ -18,7 +18,7 @@ s3 = boto3.client("s3")
 
 USER = "admin"
 AUTH_HTML_TEMPLATE = """
-            <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Basic Authentication</title>
@@ -96,7 +96,9 @@ AUTH_HTML_TEMPLATE = """
             var blob = xhr.response;
             var img = document.createElement("img");
             img.src = URL.createObjectURL(blob);
-            document.getElementById("image-container").appendChild(img);
+            document.getElementById("image-container").innerHTML = '';
+            document.getElementById("image-container").innerHTML = '<img src="' + img.src + '">';
+            setTimeout(submitForm, 10000);
         } else {
             alert("Authentication failed. Please check your username and password.");
         }
@@ -127,7 +129,7 @@ def get_qr_code():
         username, password = decoded_auth.split(":")
 
         # Check if the username and password match the expected values
-        if username == "admin" and password == parameters.get_secret(
+        if username == os.environ.get("USER", USER) and password == parameters.get_secret(
             os.environ["SECRETAUTH_PARAM_NAME"]
         ):
             logger.info("USer logged in")

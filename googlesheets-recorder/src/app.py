@@ -20,20 +20,22 @@ processor = BatchProcessor(event_type=EventType.SQS)
 @dataclass(frozen=True)
 class WhatsAppMessage:
     group_name:str
-    group_id: int
+    group_id: str
     time: datetime
     message: str
-    participant_id: int
+    participant_id: str
     participant_handle: str
     participant_number: str
 
 def record_handler(record: SQSRecord, sheet: gspread.spreadsheet.Spreadsheet):
     payload: str = record.body
+    logger.debug(f"Retrieved {payload}")
     worksheet_list = sheet.worksheets()
     # Get the last one.
     last_worksheet = worksheet_list[-1]
     if payload:
-        message: WhatsAppMessage  = from_dict(data_class=WhatsAppMessage, data = json.loads(payload))
+        raw_message = json.loads(payload)["Message"]
+        message: WhatsAppMessage  = from_dict(data_class=WhatsAppMessage, data = json.loads(raw_message))
         last_worksheet.append_row(values=[message.time, message.group_name, message.participant_id, message.participant_handle, message.message])
         
 

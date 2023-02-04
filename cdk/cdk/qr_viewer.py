@@ -1,3 +1,5 @@
+from .cdk_utils import prepare_layer
+
 from constructs import Construct
 from aws_cdk import (
     Stack,
@@ -37,8 +39,9 @@ class QRViewer(Stack):
                     self,
                     "PowerTools",
                     layer_version_arn=f"arn:aws:lambda:{self.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:18",
-                )
-            ],
+                ),
+                prepare_layer(self, layer_name="QrViewerLocalReq", poetry_dir="../qr-viewer")
+            ]
         )
 
         self._url = qr_lambda.add_function_url(

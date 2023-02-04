@@ -10,16 +10,20 @@ packages = [{include = "googlesheets_recorder"}]
 black = "black app.py cdk/*.py"
 lint = "ruff app.py cdk/*.py"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-boto3 = "^1.26.59"
-pyproject-flake8 = "^6.0.0.post1"
+[tool.poetry.group.layer.dependencies]
 dacite = "^1.8.0"
 gspread = "^5.7.2"
+boto3 = "^1.26.59"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
 aws-lambda-powertools = {extras = ["aws-sdk"], version = "^2.7.0"}
+pyproject-flake8 = "^6.0.0.post1"
+
 
 [build-system]
 requires = ["poetry-core"]

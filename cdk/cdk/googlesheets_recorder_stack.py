@@ -1,3 +1,4 @@
+from .cdk_utils import prepare_layer
 from constructs import Construct
 
 from aws_cdk import (
@@ -14,6 +15,8 @@ from aws_cdk import (
     aws_lambda_event_sources as event_sources,
 )
 
+import os
+import subprocess
 
 class GoogleSheetsRecorder(Stack):
     @property
@@ -40,7 +43,7 @@ class GoogleSheetsRecorder(Stack):
         )
         sheets_recorder = lambda_python.PythonFunction(
             self,
-            "GoogleSheetRectoder",
+            "GoogleSheetRecorder",
             runtime=_lambda.Runtime.PYTHON_3_9,
             entry="../googlesheets-recorder",
             index="src/app.py",
@@ -54,7 +57,9 @@ class GoogleSheetsRecorder(Stack):
                     self,
                     "PowerTools",
                     layer_version_arn=f"arn:aws:lambda:{self.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:18",
-                )
+                ),
+                prepare_layer(self, layer_name="GoogleSheetRecorderLocalReq", poetry_dir="../googlesheets-recorder, ")
+                
             ],
         )
 
@@ -68,3 +73,7 @@ class GoogleSheetsRecorder(Stack):
         )
 
         CfnOutput(self, "WhatsAppMessagesSns", value=whatsapp_messages.topic_arn)
+        
+    
+
+        
