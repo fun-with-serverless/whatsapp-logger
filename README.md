@@ -10,3 +10,4 @@ TODO:
 - [ ] Add observability
 - [x] Use layers
 - [ ] Improve container size
+- [ ] Use cheap NAT in the VPC
