@@ -13,8 +13,7 @@ import base64
 from http import HTTPStatus
 import boto3
 import os
-
-s3 = boto3.client("s3")
+import functools
 
 USER = "admin"
 AUTH_HTML_TEMPLATE = """
@@ -129,12 +128,12 @@ def get_qr_code():
         username, password = decoded_auth.split(":")
 
         # Check if the username and password match the expected values
-        if username == os.environ.get("USER", USER) and password == parameters.get_secret(
-            os.environ["SECRETAUTH_PARAM_NAME"]
-        ):
+        if username == os.environ.get(
+            "LOGIN_USER", USER
+        ) and password == parameters.get_secret(os.environ["SECRETAUTH_PARAM_NAME"]):
             logger.info("USer logged in")
             return Response(
-                status_code=200, content_type="image/png", body=get_qr_image()
+                status_code=200, content_type="image/png", body=_get_qr_image()
             )
         else:
             logger.info("Invalid user/pass", user=username)
@@ -153,7 +152,12 @@ def handler(event: dict, context: LambdaContext):
     return app.resolve(event, context)
 
 
-def get_qr_image() -> bytes:
+@functools.cache
+def _get_s3():
+    return boto3.client("s3")
+
+
+def _get_qr_image() -> bytes:
     bucket_name = os.environ["QR_BUCKET_NAME"]
     file_path = os.environ["QR_FILE_PATH"]
-    return s3.get_object(Bucket=bucket_name, Key=file_path)["Body"].read()
+    return _get_s3().get_object(Bucket=bucket_name, Key=file_path)["Body"].read()
