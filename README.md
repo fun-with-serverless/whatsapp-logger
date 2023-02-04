@@ -5,8 +5,8 @@ Archiving WhatsApp messages
 
 
 TODO:
-* [] Write unit tests
-* [] Create github actions
-* [] Add observability
-* [x] Use layers
-* [] Improve container size
+- [ ] Write unit tests
+- [ ] Create github actions
+- [ ] Add observability
+- [x] Use layers
+- [ ] Improve container size
