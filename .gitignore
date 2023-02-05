@@ -106,5 +106,7 @@ dist
 .wwebjs_auth
 .wwebjs_auth_
 
+#Python
+__pycache__/
 # CDK
 cdk/.build

@@ -11,9 +11,10 @@ from dacite import from_dict, Config
 
 import os
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 import functools
+from typing import Optional
 
 logger = Logger()
 processor = BatchProcessor(event_type=EventType.SQS)
@@ -28,7 +29,7 @@ class WhatsAppMessage:
     participant_id: str
     participant_handle: str
     participant_number: str
-    participant_contact_name: str
+    participant_contact_name: Optional[str] = field(default="Unknown")
 
 
 def record_handler(record: SQSRecord, sheet: gspread.spreadsheet.Spreadsheet):
