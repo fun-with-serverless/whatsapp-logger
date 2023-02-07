@@ -67,8 +67,11 @@ TBD
 * Go to the cdk folder run `poetry install` to install relevant dependencies.
 * Next run the `poetry poe deploy`. It will run the CDK deployment script. Approve the deployment of the various stacks. Sit tight, it will take a couple of minutes.
 * When the installation is complete you should get two links - 1. to the admin dashboard and 2. to the admin password stored in AWS.
-Picture
-* Get the secret password, by going to the secret manager, scroll down and click `unhide`
+![image](https://user-images.githubusercontent.com/110536677/217345457-e43cc69d-2d56-4174-9b1f-1834916bb6de.png)
+
+* Get the secret password, by going to the secret manager, scroll down and click `Retrieve secret value`
+![image](https://user-images.githubusercontent.com/110536677/217345589-d2851311-8bfc-4d37-9871-3efc33335780.png)
+
 * Go to the admin dashboard, the user name is `admin`and the password is the one you have copied.
 
 ### Setting up Google
