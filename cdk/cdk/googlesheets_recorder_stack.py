@@ -1,4 +1,5 @@
 from .cdk_utils import prepare_layer
+from .configuration import Configuration
 from constructs import Construct
 
 from aws_cdk import (
@@ -9,8 +10,6 @@ from aws_cdk import (
     aws_lambda_python_alpha as lambda_python,
     aws_lambda as _lambda,
     CfnOutput,
-    aws_secretsmanager as secretmanager,
-    aws_ssm as ssm,
     Duration,
     aws_lambda_event_sources as event_sources,
 )
@@ -21,7 +20,13 @@ class GoogleSheetsRecorder(Stack):
     def whatsapp_message_sns(self) -> sns.Topic:
         return self._whatsapp_messages
 
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(
+        self,
+        scope: Construct,
+        construct_id: str,
+        configuration: Configuration,
+        **kwargs,
+    ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         dlq = sqs.Queue(
@@ -40,10 +45,6 @@ class GoogleSheetsRecorder(Stack):
         )
         self._whatsapp_messages = whatsapp_messages
 
-        google_credentials = secretmanager.Secret(self, "GoogleCredentials")
-        sheet_url = ssm.StringParameter(
-            self, "GoogleSheetUrl", string_value="Placeholder"
-        )
         sheets_recorder = lambda_python.PythonFunction(
             self,
             "GoogleSheetRecorder",
@@ -52,8 +53,8 @@ class GoogleSheetsRecorder(Stack):
             index="src/app.py",
             timeout=Duration.minutes(1),
             environment={
-                "GOOGLE_SECRET_AUTH_NAME": google_credentials.secret_name,
-                "GOOGLE_SHEET_URL": sheet_url.parameter_name,
+                "GOOGLE_SECRET_AUTH_NAME": configuration.google_credentials_secret.secret_name,
+                "GOOGLE_SHEET_URL": configuration.sheet_url_parameter.parameter_name,
             },
             layers=[
                 _lambda.LayerVersion.from_layer_version_arn(
@@ -69,8 +70,8 @@ class GoogleSheetsRecorder(Stack):
             ],
         )
 
-        google_credentials.grant_read(sheets_recorder)
-        sheet_url.grant_read(sheets_recorder)
+        configuration.google_credentials_secret.grant_read(sheets_recorder)
+        configuration.sheet_url_parameter.grant_read(sheets_recorder)
 
         sheets_recorder.add_event_source(
             event_sources.SqsEventSource(

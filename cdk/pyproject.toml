@@ -4,10 +4,15 @@ version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.0.0"
+
 
 [tool.poe.tasks]
-black = "black app.py cdk/*.py"
-lint = "ruff app.py cdk/*.py"
+black = "black ."
+lint = "ruff ."
+mypy = "mypy . --exclude cdk.out --exclude .build"
+gate = ["black", "lint", "mypy"]
 
 
 [tool.poe.tasks.deploy]
@@ -19,7 +24,8 @@ cmd = "cdk destroy --all -c email_identity=$email_identity"
 args = [{ name = "email_identity", required = true, help = "SES email" }]
 
 [tool.ruff]
-line-length = 88
+# Never enforce `E501` (line length violations).
+ignore = ["E501"]
 
 [tool.poetry.dependencies]
 python = "^3.9"

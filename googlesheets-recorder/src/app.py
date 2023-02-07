@@ -6,7 +6,7 @@ from aws_lambda_powertools.utilities.batch import (
 )
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
 from aws_lambda_powertools.utilities import parameters
-import gspread
+import gspread  # type: ignore
 from dacite import from_dict, Config
 
 import os

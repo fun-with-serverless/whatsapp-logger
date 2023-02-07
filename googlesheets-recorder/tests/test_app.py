@@ -1,5 +1,5 @@
 import json
-import gspread
+import gspread  # type: ignore
 from unittest.mock import patch, MagicMock
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
 from src.app import record_handler

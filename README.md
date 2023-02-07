@@ -109,9 +109,10 @@ The project's logo was created by Dall-E 2 with the following description _A han
 
 
 TODO:
-- [ ] Write unit tests
+- [ ] Write unit tests for whatsapp client
 - [ ] Create github actions
 - [ ] Add observability
 - [x] Use layers
+- [x] Write utests to lambda code
 - [ ] Improve container size
 - [ ] Use cheap NAT in the VPC

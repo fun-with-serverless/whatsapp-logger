@@ -10,7 +10,8 @@ packages = [{include = "googlesheets_recorder"}]
 black = "black ."
 lint = "ruff ."
 pytest = "pytest"
-gate = ["black", "lint", "pytest"]
+mypy = "mypy ."
+gate = ["black", "lint", "pytest", "mypy"]
 
 
 [tool.poetry.group.layer.dependencies]
@@ -31,6 +32,7 @@ aws-lambda-powertools = {extras = ["aws-sdk"], version = "^2.7.0"}
 pyproject-flake8 = "^6.0.0.post1"
 pytest = "^7.2.1"
 ruff = "^0.0.241"
+mypy = "^1.0.0"
 
 
 [build-system]
