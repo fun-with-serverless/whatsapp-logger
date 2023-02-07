@@ -3,7 +3,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img width="256" height="256" src="https://user-images.githubusercontent.com/110536677/217332241-6a4eb1f5-67bc-42bc-b88d-4e79f5eae935.png" alt="A 3d art showing whatsapp application turning into small water drops that fall">
+    <img width="256" height="256" src="https://user-images.githubusercontent.com/110536677/216813972-ea76373f-bfaa-4875-bdfa-5c93bd91acb7.png" alt="A 3d art showing whatsapp application turning into small water drops that fall">
 
 <h3 align="center">WhatsApp Group Manager</h3>
 
@@ -47,7 +47,7 @@ In the future, we plan to add daily summaries of the discussions, providing a qu
 ## High level architecture
 
 <div align="center">
-    <img src="https://user-images.githubusercontent.com/110536677/216052857-23976f95-5846-4ea5-8cb8-0eeb2532c370.png" alt="Architecture diagram">
+    <img src="https://user-images.githubusercontent.com/110536677/217332241-6a4eb1f5-67bc-42bc-b88d-4e79f5eae935.png" alt="Architecture diagram">
 </div>
 
 TBD
