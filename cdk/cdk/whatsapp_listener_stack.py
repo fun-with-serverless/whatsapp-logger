@@ -7,10 +7,8 @@ from aws_cdk import (
     aws_sns as sns,
     aws_efs as efs,
     RemovalPolicy,
-    aws_ses as ses,
 )
 from constructs import Construct
-from typing import Optional
 
 EFS_MOUNT_POINT = "/mnt/efs"
 
@@ -26,7 +24,6 @@ class WhatsAppListener(Stack):
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        email_identity = self._create_email_identity()
 
         vpc = ec2.Vpc(self, "VPC", max_azs=1)
         sg = self._create_security_group(vpc)
@@ -34,7 +31,6 @@ class WhatsAppListener(Stack):
         self._create_ecs_cluster(
             lambda_url=lambda_url,
             whatsapp_messages=whatsapp_messages,
-            email_identity=email_identity,
             qr_bucket=qr_bucket,
             vpc=vpc,
             sg=sg,
@@ -45,7 +41,6 @@ class WhatsAppListener(Stack):
         self,
         lambda_url: str,
         whatsapp_messages: sns.Topic,
-        email_identity: Optional[str],
         qr_bucket: s3.Bucket,
         vpc: ec2.Vpc,
         sg: ec2.SecurityGroup,
@@ -60,7 +55,6 @@ class WhatsAppListener(Stack):
             image=ecs.ContainerImage.from_asset("../whatsapp-web-listener"),
             environment={
                 "QR_BUCKET_NAME": qr_bucket.bucket_name,
-                "SEND_QR_TO": email_identity,
                 "WHATAPP_SNS_TOPIC_ARN": whatsapp_messages.topic_arn,
                 "PERSISTANCE_STORAGE_MOUNT_POINT": EFS_MOUNT_POINT,
                 "URL_IN_MAIL": lambda_url,
@@ -112,17 +106,6 @@ class WhatsAppListener(Stack):
             security_group=sg,
             vpc_subnets=ec2.SubnetSelection(subnets=[private_subnet]),
         )
-
-    def _create_email_identity(self) -> Optional[str]:
-        email_identity = self.node.try_get_context("email_identity")
-        if email_identity is None:
-            return None
-
-        ses.EmailIdentity(
-            self, "QRCodeIdentity", identity=ses.Identity.email(email_identity)
-        )
-
-        return email_identity
 
     def _create_security_group(self, vpc: ec2.Vpc) -> ec2.SecurityGroup:
         sg = ec2.SecurityGroup(self, "HTTPSOnly", vpc=vpc, allow_all_outbound=False)

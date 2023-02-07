@@ -13,15 +13,8 @@ black = "black ."
 lint = "ruff ."
 mypy = "mypy . --exclude cdk.out --exclude .build"
 gate = ["black", "lint", "mypy"]
-
-
-[tool.poe.tasks.deploy]
-cmd = "cdk deploy --all -c email_identity=$email_identity"
-args = [{ name = "email_identity", required = false, help = "SES email" }]
-
-[tool.poe.tasks.destroy]
-cmd = "cdk destroy --all -c email_identity=$email_identity"
-args = [{ name = "email_identity", required = false, help = "SES email" }]
+deploy = "cdk deploy --all"
+destroy = "cdk destroy --all"
 
 [tool.ruff]
 # Never enforce `E501` (line length violations).

@@ -12,5 +12,5 @@ RUN apt-get update && \
 COPY package*.json ./
 RUN npm ci --production
 COPY src/*.js ./
-COPY node_modules/ ./
+COPY . .
 CMD ["node", "index.js"]
