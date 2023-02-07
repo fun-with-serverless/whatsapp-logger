@@ -117,7 +117,7 @@ Here’s how to get one:
 ### Connecting WhatsApps
 * Behind the scenes this application uses WhatsApp web to pull chat content.
 * In order to connect to WhatsApp you need to scan a QR code with your **Real WhatsApp instance**, that is, the one that runs on a real phone.
-* Pay attention this is experimental process, and WhatsApp may detect it as a bot and disconnect the number. It's better to use an expandible number.
+* Please be aware that this process is experimental and may result in your WhatsApp number being identified as a bot and disconnected. It is recommended to use a disposable number instead.
 * In the admin dashboard click on `Show QR code`, and scan the image with your WhatsApp app.
 * You are good to go. See your spreadsheet gets updated.
 
