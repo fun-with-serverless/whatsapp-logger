@@ -110,6 +110,8 @@ Here’s how to get one:
 * Now go to the admin dashboard from the previous section.
 * Paste the json into the `Google Secret` text box.
 * Copy the the spreadsheet url you created in step one and paste it into the `Sheet URL` text box.
+![image](https://user-images.githubusercontent.com/110536677/217345941-03d33d0d-d1d7-4c3b-b94f-3b6d0d9e5194.png)
+
 * Click save and you are done.
 
 ### Connecting WhatsApps
