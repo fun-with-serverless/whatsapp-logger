@@ -34,7 +34,6 @@ In the future, we plan to add daily summaries of the discussions, providing a qu
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
-        <li><a href="#testing">Testing</a></li>
       </ul>
     </li>
     <li><a href="#contributing">Contributing</a></li>
@@ -53,27 +52,70 @@ In the future, we plan to add daily summaries of the discussions, providing a qu
 
 TBD
 
-<!--
+
 ## Getting started
 ### Prerequisites
-* Make sure your machine is ready to work with [AWS SAM](https://aws.amazon.com/serverless/sam/)
+* Make sure to have the [latest CDK version installed](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) (V2).
+* An AWS enviornment.
+* Python 3.9 (I highly recommend using [pyenv](https://github.com/pyenv/pyenv#installation)).
+* [Python Poetry](https://python-poetry.org/docs/#installation)
+
 
 ### Installation
 * Clone this repository.
-* Run `sam build` and then `sam deploy --guided`. Accept the default values, except for 
-    * _Parameter Email - Send a reminder to this email. 
+* The application uses CDK as IaC framework. 
+* Go to the cdk folder run `poetry install` to install relevant dependencies.
+* Next run the `poetry poe deploy`. It will run the CDK deployment script. Approve the deployment of the various stacks. Sit tight, it will take a couple of minutes.
+* When the installation is complete you should get two links - 1. to the admin dashboard and 2. to the admin password stored in AWS.
+Picture
+* Get the secret password, by going to the secret manager, scroll down and click `unhide`
+* Go to the admin dashboard, the user name is `admin`and the password is the one you have copied.
 
+### Setting up Google
+* Create a new spreadsheet in google sheet.
+* In case you want to save yur whatsapp chats into google sheets, you need to configure a google cloud account.
+* Head to [Google Developers Console](https://console.cloud.google.com/apis/dashboard?project=serverless-demo-210412) and create a new project (or select the one you already have).
+* In the box labeled "Search for APIs and Services", search for “Google Drive API” and enable it.
+* In the box labeled "Search for APIs and Services", search for “Google Sheets API” and enable it.
 
-### Testing
-* You can test the application manully by executing the `RemindMeFunction` Lambda directly from the console. It accepts a json with the following structure:
+Service account is a special type of Google account intended to represent a non-human user that needs to authenticate and be authorized to access data in Google APIs.
+
+Since it’s a separate account, by default it does not have access to any spreadsheet until you share it with this account. Just like any other Google account.
+
+Here’s how to get one:
+* Enable API Access for a Project if you haven’t done it yet.
+* Go to “APIs & Services > Credentials” and choose “Create credentials > Service account key”.
+* Fill out the form
+* Click “Create” and “Done”.
+* Press “Manage service accounts” above Service Accounts.
+* Press on ⋮ near recently created service account and select “Manage keys” and then click on “ADD KEY > Create new key”.
+* Select JSON key type and press “Create”.
+* You will automatically download a JSON file with credentials. It may look like this:
 ```
 {
-  "content": "Hello my friend",
-  "when": "2022-11-12T23:20",
-  "timezone": "Asia/Bangkok"
+    "type": "service_account",
+    "project_id": "api-project-XXX",
+    "private_key_id": "2cd … ba4",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nNrDyLw … jINQh/9\n-----END PRIVATE KEY-----\n",
+    "client_email": "473000000000-yoursisdifferent@developer.gserviceaccount.com",
+    "client_id": "473 … hd.apps.googleusercontent.com",
+    ...
 }
 ```
--->
+* Remember the path to the downloaded credentials file. Also, in the next step you’ll need the value of client_email from this file.
+* Very important! Go to your spreadsheet and share it with a client_email from the step above. Just like you do with any other Google account.
+* Now go to the admin dashboard from the previous section.
+* Paste the json into the `Google Secret` text box.
+* Copy the the spreadsheet url you created in step one and paste it into the `Sheet URL` text box.
+* Click save and you are done.
+
+### Connecting WhatsApps
+* Behind the scenes this application uses WhatsApp web to pull chat content.
+* In order to connect to WhatsApp you need to scan a QR code with your **Real WhatsApp instance**, that is, the one that runs on a real phone.
+* Pay attention this is experimental process, and WhatsApp may detect it as a bot and disconnect the number. It's better to use an expandible number.
+* In the admin dashboard click on `Show QR code`, and scan the image with your WhatsApp app.
+* You are good to go. See your spreadsheet gets updated.
+
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.

@@ -30,3 +30,5 @@ whatsapp_listener = WhatsAppListener(
 )
 
 app.synth()
+
+print(f"Admin Panel URL: {admin_panel.lambda_url}")

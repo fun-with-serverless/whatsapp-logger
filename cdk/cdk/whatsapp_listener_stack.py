@@ -10,6 +10,7 @@ from aws_cdk import (
     aws_ses as ses,
 )
 from constructs import Construct
+from typing import Optional
 
 EFS_MOUNT_POINT = "/mnt/efs"
 
@@ -44,7 +45,7 @@ class WhatsAppListener(Stack):
         self,
         lambda_url: str,
         whatsapp_messages: sns.Topic,
-        email_identity: str,
+        email_identity: Optional[str],
         qr_bucket: s3.Bucket,
         vpc: ec2.Vpc,
         sg: ec2.SecurityGroup,
@@ -112,10 +113,10 @@ class WhatsAppListener(Stack):
             vpc_subnets=ec2.SubnetSelection(subnets=[private_subnet]),
         )
 
-    def _create_email_identity(self) -> str:
+    def _create_email_identity(self) -> Optional[str]:
         email_identity = self.node.try_get_context("email_identity")
         if email_identity is None:
-            raise Exception("Missing email_identity parameter")
+            return None
 
         ses.EmailIdentity(
             self, "QRCodeIdentity", identity=ses.Identity.email(email_identity)

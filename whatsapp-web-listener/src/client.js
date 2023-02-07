@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode");
 const fs = require("fs-extra");
-const { getEnv, sendEmail } = require("./utils");
+const { getEnv, sendEmail, getEnvOrDefault } = require("./utils");
 const pino = require("pino")();
 const { setIntervalAsync, clearIntervalAsync } = require("set-interval-async");
 
@@ -18,7 +18,7 @@ class WhatsAppClient {
 
   async startListening() {
     this.qrBucketName = getEnv("QR_BUCKET_NAME");
-    this.sendMailTo = getEnv("SEND_QR_TO");
+    this.sendMailTo = getEnvOrDefault("SEND_QR_TO", null);
     this.sendMessageToSNSARN = getEnv("WHATAPP_SNS_TOPIC_ARN");
     this.efsPath = getEnv("PERSISTANCE_STORAGE_MOUNT_POINT");
     this.linkUrl = getEnv("URL_IN_MAIL");
@@ -122,6 +122,10 @@ class WhatsAppClient {
   }
 
   async asyncSendMail(ses, source, to, imageUrl) {
+    if (source === null) {
+      pino.info("Email is not configured. Skipping...");
+      return
+    }
     try {
       await sendEmail(ses, source, to, imageUrl);
       pino.info(`Sent email with QR details to ${to}`);

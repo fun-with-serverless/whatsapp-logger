@@ -6,6 +6,23 @@ function getEnv(name) {
   return env;
 }
 
+function getEnvOrDefault(name, defaultValue) {
+  const env = process.env[name];
+  if (!env) {
+    return defaultValue
+  }
+  return env;
+}
+
+/**
+ * Sends an email using the Amazon Simple Email Service (SES) client
+ * 
+ * @param {Object} ses - The Amazon SES client
+ * @param {string} source - The email address the email will be sent from.
+ * @param {string} to - The email address the email will be sent to
+ * @param {string} imageUrl - The URL of an image to be included in the email
+ * 
+ */
 const sendEmail = async (ses, source, to, imageUrl) => {
   // Create the email parameters
   const params = {
@@ -18,7 +35,7 @@ const sendEmail = async (ses, source, to, imageUrl) => {
           Charset: "UTF-8",
           Data: `<html>
             <body>
-              <p>Please approve the QR code <a href="${imageUrl}">by scanning this image</a></p>
+              <p>Application is ready.<br/> <a href="${imageUrl}">Admin portal</a></p>
             </body>
           </html>`,
         },
@@ -38,5 +55,6 @@ const sendEmail = async (ses, source, to, imageUrl) => {
 
 module.exports = {
   getEnv,
+  getEnvOrDefault,
   sendEmail,
 };
