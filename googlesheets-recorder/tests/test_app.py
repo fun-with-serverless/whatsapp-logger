@@ -25,6 +25,7 @@ def test_record_handler():
             "test_name",
             "test_handle",
             "test_message",
+            False,
         ]
 
 
@@ -45,7 +46,7 @@ def test_record_handler_group_is_empty_no_row_is_appended():
 def _get_body(group_name: str) -> str:
     return json.dumps(
         {
-            "Message": '{{"group_name": "{group_name}", "group_id": "test_id", "time": 1612081880, "message": "test_message", "participant_id": "test_participant_id", "participant_handle": "test_handle", "participant_number": "test_number", "participant_contact_name": "test_name"}}'.format(
+            "Message": '{{"group_name": "{group_name}", "group_id": "test_id", "time": 1612081880, "message": "test_message", "participant_id": "test_participant_id", "participant_handle": "test_handle", "participant_number": "test_number", "participant_contact_name": "test_name", "has_media": false}}'.format(
                 group_name=group_name
             )
         }

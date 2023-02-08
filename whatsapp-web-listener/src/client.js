@@ -35,7 +35,7 @@ class WhatsAppClient {
       puppeteer: {
         args: ['--no-sandbox']
       },
-      authStrategy: new LocalAuth('./local_auth')
+      authStrategy: new LocalAuth({ dataPath: './local_auth' })
     })
 
     this.client.on('qr', this.onQr.bind(this))
@@ -82,6 +82,7 @@ class WhatsAppClient {
   async onReady () {
     try {
       await fs.copy('./local_auth', `${this.efsPath}/local_auth`)
+      pino.info('Copied')
     } catch (err) {
       pino.error(
         `Unable to copy local cache  to efs, ignoring. ERR - ${err.message}`
@@ -105,7 +106,8 @@ class WhatsAppClient {
         participant_handle: contact.pushname,
         participant_number: contact.number,
         participant_contact_name: contact.name,
-        message: message.body
+        message: message.body,
+        has_media: message.hasMedia
       }
 
       pino.info(message)

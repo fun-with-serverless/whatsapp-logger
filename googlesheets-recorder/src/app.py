@@ -29,6 +29,7 @@ class WhatsAppMessage:
     participant_id: str
     participant_handle: str
     participant_number: str
+    has_media: bool
     participant_contact_name: Optional[str] = field(default="Unknown")
 
 
@@ -57,6 +58,7 @@ def record_handler(record: SQSRecord, sheet: gspread.spreadsheet.Spreadsheet):
                     message.participant_contact_name,
                     message.participant_handle,
                     message.message,
+                    message.has_media,
                 ]
             )
 
@@ -77,6 +79,7 @@ def _get_worksheet(
                 "Contact Name",
                 "Participant Handle",
                 "Message",
+                "Has media?",
             ]
         )
 
