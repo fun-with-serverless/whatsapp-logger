@@ -47,17 +47,18 @@ def record_handler(record: SQSRecord, sheet: gspread.spreadsheet.Spreadsheet):
             data=json.loads(raw_message),
             config=Config(type_hooks={datetime: converter}),
         )
-        group_sheet = _get_worksheet(sheet, message.group_name)
-        group_sheet.append_row(
-            values=[
-                message.time.isoformat(),
-                message.group_name,
-                message.participant_number,
-                message.participant_contact_name,
-                message.participant_handle,
-                message.message,
-            ]
-        )
+        if message.group_name.strip():
+            group_sheet = _get_worksheet(sheet, message.group_name)
+            group_sheet.append_row(
+                values=[
+                    message.time.isoformat(),
+                    message.group_name,
+                    message.participant_number,
+                    message.participant_contact_name,
+                    message.participant_handle,
+                    message.message,
+                ]
+            )
 
 
 def _get_worksheet(
