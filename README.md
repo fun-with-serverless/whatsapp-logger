@@ -161,7 +161,7 @@ Efi Merdler-Kravitz - [@TServerless](https://twitter.com/TServerless)
 
 
 ## Logo
-The project's logo was created by Dall-E 2 with the following description _A hand drawn sketch of a sticky note floating on a cloud_
+The project's logo was created by Dall-E 2 with the following description _A 3d art showing whatsapp application turning into small water drops that fall_
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
