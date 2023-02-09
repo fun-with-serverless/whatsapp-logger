@@ -64,7 +64,7 @@ def basic_auth() -> str:
     basic_auth = base64.b64encode(f"{USER}:{SECRET_STRING}".encode()).decode()
     return f"Basic {basic_auth}"
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def set_aws_region():
     os.environ["AWS_REGION"] = "us-east-1"
     yield
