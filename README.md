@@ -72,6 +72,7 @@ This architecture consists of several AWS components that work together to allow
 * An AWS enviornment.
 * Python 3.9 (I highly recommend using [pyenv](https://github.com/pyenv/pyenv#installation)).
 * [Python Poetry](https://python-poetry.org/docs/#installation)
+* Add [Poe the Poet](https://github.com/nat-n/poethepoet) to Poetry by running `poetry self add 'poethepoet[poetry_plugin]'`
 
 
 ### Installation
@@ -165,14 +166,3 @@ The project's logo was created by Dall-E 2 with the following description _A 3d 
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-TODO:
-- [ ] Write unit tests for whatsapp client
-- [ ] Create github actions
-- [ ] Add observability
-- [x] Use layers
-- [x] Write utests to lambda code
-- [ ] Improve container size
-- [ ] Use cheap NAT in the VPC
