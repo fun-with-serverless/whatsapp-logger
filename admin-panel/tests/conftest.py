@@ -66,6 +66,6 @@ def basic_auth() -> str:
 
 @pytest.fixture(autouse=True)
 def set_aws_region():
-    os.environ["AWS_REGION"] = "us-east-1"
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
     yield
-    del os.environ["AWS_REGION"]
+    del os.environ["AWS_DEFAULT_REGION"]
