@@ -49,13 +49,3 @@ jobs:
     - name: Run gatekeeper script
       run: ./scripts/gate.sh
 
-    - name: Check exit code
-      id: check-exit-code
-      run: echo ::set-output name=exit-code::$?
-
-    - name: Prevent merge
-      if: steps.check-exit-code.outputs.exit-code != '0'
-      uses: peter-evans/mergeable@v2
-      with:
-        state: false
-        message: The gatekeeper script failed. Please fix the errors and try again.
