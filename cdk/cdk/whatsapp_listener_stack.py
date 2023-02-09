@@ -25,7 +25,7 @@ class WhatsAppListener(Stack):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        vpc = ec2.Vpc(self, "VPC", max_azs=1)
+        vpc = self._create_vpc()
         sg = self._create_security_group(vpc)
         file_system = self._create_efs(sg=sg, vpc=vpc)
         self._create_ecs_cluster(
@@ -36,6 +36,16 @@ class WhatsAppListener(Stack):
             sg=sg,
             file_system=file_system,
         )
+
+    def _create_vpc(self) -> ec2.Vpc:
+        nat_gateway_provider = ec2.NatProvider.instance(
+            instance_type=ec2.InstanceType("t3.micro")
+        )
+        vpc = ec2.Vpc(self, "VPC", max_azs=1, nat_gateway_provider=nat_gateway_provider)
+        if self.node.try_get_context("stage") == "prod":
+            vpc = ec2.Vpc(self, "VPC", max_azs=1)
+
+        return vpc
 
     def _create_ecs_cluster(
         self,

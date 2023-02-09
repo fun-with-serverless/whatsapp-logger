@@ -110,3 +110,4 @@ dist
 __pycache__/
 # CDK
 cdk/.build
+cdk.context.json
