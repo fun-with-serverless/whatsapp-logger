@@ -1,0 +1,56 @@
+name: Gatekeeper
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  gatekeeper:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js 16
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Set up Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry self add 'poethepoet[poetry_plugin]'
+
+    - name: Install dependencies in cdk folder
+      run: |
+        pushd cdk
+        poetry install
+        popd
+
+    - name: Install dependencies in googlesheets-recorder folder
+      run: |
+        pushd googlesheets-recorder
+        poetry install
+        popd
+    - name: Install dependencies in admin-panel folder
+      run: |
+        pushd admin-panel
+        poetry install
+        popd
+
+    - name: Install dependencies in whatsapp-web-listener folder
+      run: |
+        pushd whatsapp-web-listener
+        npm install
+        popd
+
+    - name: Run gatekeeper script
+      run: ./scripts/gate.sh
+

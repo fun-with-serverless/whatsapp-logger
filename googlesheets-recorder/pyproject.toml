@@ -3,8 +3,6 @@ name = "googlesheets-recorder"
 version = "0.1.0"
 description = ""
 authors = ["Efi Merdler-Kravitz"]
-readme = "README.md"
-packages = [{include = "googlesheets_recorder"}]
 
 [tool.poe.tasks]
 black = "black ."

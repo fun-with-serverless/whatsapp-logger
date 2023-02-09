@@ -3,8 +3,6 @@ name = "admin-panel"
 version = "0.1.0"
 description = ""
 authors = ["Efi MK"]
-readme = "README.md"
-packages = [{include = "admin_panel"}]
 
 [tool.poe.tasks]
 black = "black ."
