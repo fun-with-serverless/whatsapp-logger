@@ -16,7 +16,7 @@ pushd googlesheet-recorder
 poetry poe gate
 popd
 
-pushd googlesheet-recorder
+pushd googlesheets-recorder
 poetry poe gate
 popd
 
