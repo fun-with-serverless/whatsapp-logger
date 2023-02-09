@@ -12,13 +12,10 @@ pushd cdk
 poetry poe gate
 popd
 
-pushd googlesheet-recorder
-poetry poe gate
-popd
-
 pushd googlesheets-recorder
 poetry poe gate
 popd
+
 
 pushd whatsapp-web-listener
 npm run prettier
