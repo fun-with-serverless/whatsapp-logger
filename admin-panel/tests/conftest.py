@@ -2,6 +2,7 @@ import moto  # type: ignore
 import boto3
 import pytest
 import base64
+import os
 
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"
@@ -62,3 +63,9 @@ def parameters_store(monkeypatch):
 def basic_auth() -> str:
     basic_auth = base64.b64encode(f"{USER}:{SECRET_STRING}".encode()).decode()
     return f"Basic {basic_auth}"
+
+@pytest.fixture
+def set_aws_region():
+    os.environ["AWS_REGION"] = "us-east-1"
+    yield
+    del os.environ["AWS_REGION"]
