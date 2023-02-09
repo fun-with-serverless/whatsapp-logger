@@ -29,22 +29,26 @@ jobs:
 
     - name: Install dependencies in cdk folder
       run: |
-        cd cdk
+        pushd cdk
         poetry install
+        popd
 
     - name: Install dependencies in googlesheets-recorder folder
       run: |
-        cd ../googlesheets-recorder
+        pushd googlesheets-recorder
         poetry install
+        popd
     - name: Install dependencies in admin-panel folder
       run: |
-        cd ../admin-panel
+        pushd admin-panel
         poetry install
+        popd
 
     - name: Install dependencies in whatsapp-web-listener folder
       run: |
-        cd ../whatsapp-web-listener
+        pushd whatsapp-web-listener
         npm install
+        popd
 
     - name: Run gatekeeper script
       run: ./scripts/gate.sh
