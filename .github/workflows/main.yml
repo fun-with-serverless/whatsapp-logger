@@ -1,0 +1,61 @@
+name: Gatekeeper
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  gatekeeper:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js 16
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Set up Poetry
+      run: |
+        curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+
+    - name: Install dependencies in cdk folder
+      run: |
+        cd cdk
+        poetry install
+
+    - name: Install dependencies in googlesheets-recorder folder
+      run: |
+        cd ../googlesheets-recorder
+        poetry install
+    - name: Install dependencies in admin-panel folder
+      run: |
+        cd ../admin-panel
+        poetry install
+
+    - name: Install dependencies in whatsapp-web-listener folder
+      run: |
+        cd ../whatsapp-web-listener
+        npm install
+
+    - name: Run gatekeeper script
+      run: ./scripts/gate.sh
+
+    - name: Check exit code
+      id: check-exit-code
+      run: echo ::set-output name=exit-code::$?
+
+    - name: Prevent merge
+      if: steps.check-exit-code.outputs.exit-code != '0'
+      uses: peter-evans/mergeable@v2
+      with:
+        state: false
+        message: The gatekeeper script failed. Please fix the errors and try again.
