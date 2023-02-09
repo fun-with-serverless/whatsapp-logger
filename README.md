@@ -72,6 +72,7 @@ This architecture consists of several AWS components that work together to allow
 * An AWS enviornment.
 * Python 3.9 (I highly recommend using [pyenv](https://github.com/pyenv/pyenv#installation)).
 * [Python Poetry](https://python-poetry.org/docs/#installation)
+* Add [Poe the Poet](https://github.com/nat-n/poethepoet) to Poetry by running `poetry self add 'poethepoet[poetry_plugin]'`
 
 
 ### Installation
