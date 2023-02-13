@@ -7,6 +7,8 @@ from aws_cdk import (
     aws_sns as sns,
     aws_efs as efs,
     RemovalPolicy,
+    aws_events as eb,
+    aws_sqs as sqs,
 )
 from constructs import Construct
 
@@ -21,6 +23,8 @@ class WhatsAppListener(Stack):
         whatsapp_messages: sns.Topic,
         qr_bucket: s3.Bucket,
         lambda_url: str,
+        event_bus: eb.EventBus,
+        sqs_target: sqs.Queue,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -35,6 +39,7 @@ class WhatsAppListener(Stack):
             vpc=vpc,
             sg=sg,
             file_system=file_system,
+            sqs_target=sqs_target,
         )
 
     def _create_vpc(self) -> ec2.Vpc:
@@ -55,6 +60,7 @@ class WhatsAppListener(Stack):
         vpc: ec2.Vpc,
         sg: ec2.SecurityGroup,
         file_system: efs.FileSystem,
+        sqs_target: sqs.Queue,
     ) -> None:
         cluster = ecs.Cluster(self, "Cluster", vpc=vpc)
         fargate_task_definition = ecs.FargateTaskDefinition(
@@ -68,6 +74,7 @@ class WhatsAppListener(Stack):
                 "WHATAPP_SNS_TOPIC_ARN": whatsapp_messages.topic_arn,
                 "PERSISTANCE_STORAGE_MOUNT_POINT": EFS_MOUNT_POINT,
                 "URL_IN_MAIL": lambda_url,
+                "SQS_EVENT_URL": sqs_target.queue_url,
             },
             logging=ecs.LogDrivers.aws_logs(stream_prefix="whatsapp-listener"),
         )
@@ -82,6 +89,12 @@ class WhatsAppListener(Stack):
         fargate_task_definition.add_to_task_role_policy(
             iam.PolicyStatement(
                 actions=["s3:PutObject"], resources=[f"{qr_bucket.bucket_arn}/*"]
+            )
+        )
+        fargate_task_definition.add_to_task_role_policy(
+            iam.PolicyStatement(
+                actions=["sqs:ReceiveMessage", "sqs:DeleteMessage"],
+                resources=[sqs_target.queue_arn],
             )
         )
 

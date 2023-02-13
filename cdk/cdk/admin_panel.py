@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_s3 as s3,
     Duration,
+    aws_events as eb,
 )
 
 
@@ -21,6 +22,7 @@ class AdminPanel(Stack):
         id: str,
         qr_bucket: s3.Bucket,
         configuration: Configuration,
+        event_bus: eb.EventBus,
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
@@ -62,3 +64,4 @@ class AdminPanel(Stack):
         configuration.google_credentials_secret.grant_write(qr_lambda)
         configuration.sheet_url_parameter.grant_read(qr_lambda)
         configuration.sheet_url_parameter.grant_write(qr_lambda)
+        event_bus.grant_put_events_to(qr_lambda)

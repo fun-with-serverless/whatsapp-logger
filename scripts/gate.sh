@@ -18,6 +18,5 @@ popd
 
 
 pushd whatsapp-web-listener
-npm run prettier
-npm run lint
+npm run gate
 popd

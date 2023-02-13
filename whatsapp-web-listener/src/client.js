@@ -2,11 +2,10 @@ const AWS = require('aws-sdk')
 const { Client, LocalAuth } = require('whatsapp-web.js')
 const qrcode = require('qrcode')
 const fs = require('fs-extra')
-const { getEnv, sendEmail, getEnvOrDefault } = require('./utils')
-const pino = require('pino')()
-const { setIntervalAsync, clearIntervalAsync } = require('set-interval-async')
+const { getEnv } = require('./utils')
 
-const ONE_HOUR = 3600000
+const pino = require('pino')()
+
 class WhatsAppClient {
   constructor () {
     this.intervalId = null
@@ -18,14 +17,13 @@ class WhatsAppClient {
 
   async startListening () {
     this.qrBucketName = getEnv('QR_BUCKET_NAME')
-    this.sendMailTo = getEnvOrDefault('SEND_QR_TO', null)
     this.sendMessageToSNSARN = getEnv('WHATAPP_SNS_TOPIC_ARN')
     this.efsPath = getEnv('PERSISTANCE_STORAGE_MOUNT_POINT')
-    this.linkUrl = getEnv('URL_IN_MAIL')
+    this.efsCache = `${this.efsPath}/local_auth`
 
     try {
-      await fs.ensureDir(`${this.efsPath}/local_auth`, 775)
-      await fs.copy(`${this.efsPath}/local_auth`, './local_auth')
+      await fs.ensureDir(this.efsCache, 775)
+      await fs.copy(this.efsCache, './local_auth')
     } catch (err) {
       pino.error(
         `Unable to copy efs cache dir, if it's the first run, then this error is valid. ERR - ${err.message}`
@@ -58,24 +56,6 @@ class WhatsAppClient {
       }
       await this.s3.upload(params).promise()
       pino.info('Uploaded QR code')
-      if (this.intervalId === null) {
-        await this.asyncSendMail(
-          this.ses,
-          this.sendMailTo,
-          this.sendMailTo,
-          this.linkUrl
-        )
-        this.intervalId = setIntervalAsync(async () => {
-          await this.asyncSendMail(
-            this.ses,
-            this.sendMailTo,
-            this.sendMailTo,
-            this.linkUrl
-          )
-        }, ONE_HOUR)
-      } else {
-        pino.info('Email sent, skipping')
-      }
     })
   }
 
@@ -87,9 +67,6 @@ class WhatsAppClient {
       pino.error(
         `Unable to copy local cache  to efs, ignoring. ERR - ${err.message}`
       )
-    }
-    if (this.intervalId !== null) {
-      clearIntervalAsync(this.intervalId)
     }
     pino.info('Client is ready!')
   }
@@ -123,17 +100,13 @@ class WhatsAppClient {
     }
   }
 
-  async asyncSendMail (ses, source, to, imageUrl) {
-    if (source === null) {
-      pino.info('Email is not configured. Skipping...')
-      return
-    }
-    try {
-      await sendEmail(ses, source, to, imageUrl)
-      pino.info(`Sent email with QR details to ${to}`)
-    } catch (err) {
-      pino.error(`Failed sending QR email. ERR - ${err.message}`)
-    }
+  async logout () {
+    pino.info('Logging out')
+    this.client.authStrategy.logout()
+    this.client.destroy()
+    fs.remove(this.efsCache)
+    this.startListening()
+    pino.info('Logged out')
   }
 }
 
