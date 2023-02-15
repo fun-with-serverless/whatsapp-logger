@@ -4,6 +4,7 @@ from aws_lambda_powertools.event_handler import LambdaFunctionUrlResolver, Respo
 from dacite import from_dict
 
 from src.utils.authentication import basic_authenticate
+from src.utils.dynamodb_models import ApplicationState, ClientStatus
 from aws_lambda_powertools.utilities import parameters
 import boto3
 
@@ -21,6 +22,22 @@ app = LambdaFunctionUrlResolver()
 class Configuration:
     google_secret: str
     sheet_url: str
+
+
+@dataclass(frozen=True)
+class DeviceStatus:
+    device_status: str
+
+
+@app.get("/device-status")
+@basic_authenticate(app)
+def get_device_status():
+    status = ClientStatus.DISCONNECTED.value
+    try:
+        status = ApplicationState.get_client_status().value
+    except ApplicationState.DoesNotExist:
+        pass
+    return asdict(DeviceStatus(device_status=status))
 
 
 @app.get("/qr-code")
@@ -50,7 +67,6 @@ def home():
 @basic_authenticate(app)
 def set_configuratio():
     conf = from_dict(data_class=Configuration, data=json.loads(app.current_event.body))
-    print(conf)
     secret = _get_secret_manager()
     secret.update_secret(
         SecretId=os.environ["GOOGLE_SECRET_AUTH_NAME"], SecretString=conf.google_secret
@@ -65,7 +81,24 @@ def set_configuratio():
     return Response(status_code=200)
 
 
-@logger.inject_lambda_context
+@app.post("/disconnect")
+@basic_authenticate(app)
+def disconnect():
+    events = _get_events()
+    events.put_events(
+        Entries=[
+            {
+                "EventBusName": os.environ["EVENT_BUS_ARN"],
+                "Detail": str({}),
+                "DetailType": "logout",
+                "Source": "admin",
+            }
+        ]
+    )
+    return Response(status_code=200)
+
+
+@logger.inject_lambda_context(log_event=True)
 def handler(event: dict, context: LambdaContext):
     return app.resolve(event, context)
 
@@ -83,6 +116,11 @@ def _get_secret_manager():
 @functools.cache
 def _get_ssm():
     return boto3.client("ssm")
+
+
+@functools.cache
+def _get_events():
+    return boto3.client("events")
 
 
 def _get_qr_image() -> bytes:

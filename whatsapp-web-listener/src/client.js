@@ -1,18 +1,17 @@
-const AWS = require('aws-sdk')
 const { Client, LocalAuth } = require('whatsapp-web.js')
 const qrcode = require('qrcode')
 const fs = require('fs-extra')
-const { getEnv } = require('./utils')
+const { getEnv, sendStatusUpdate } = require('./utils')
 
 const pino = require('pino')()
 
 class WhatsAppClient {
-  constructor () {
+  constructor ({ sns, s3, eventbridge }) {
     this.intervalId = null
 
-    this.sns = new AWS.SNS()
-    this.ses = new AWS.SES()
-    this.s3 = new AWS.S3()
+    this.sns = sns
+    this.s3 = s3
+    this.eventbridge = eventbridge
   }
 
   async startListening () {
@@ -20,6 +19,7 @@ class WhatsAppClient {
     this.sendMessageToSNSARN = getEnv('WHATAPP_SNS_TOPIC_ARN')
     this.efsPath = getEnv('PERSISTANCE_STORAGE_MOUNT_POINT')
     this.efsCache = `${this.efsPath}/local_auth`
+    this.eventBridgeArn = getEnv('EVENTBRIDGE_ARN')
 
     try {
       await fs.ensureDir(this.efsCache, 775)
@@ -47,6 +47,11 @@ class WhatsAppClient {
 
   async onQr (qr) {
     pino.info('QR code generated.')
+    await sendStatusUpdate({
+      eventbridge: this.eventbridge,
+      eventbridgeArn: this.eventBridgeArn,
+      detailsType: 'Disconnected'
+    })
     await qrcode.toFile('./file.png', qr, async (qrcode) => {
       const qrImageFile = fs.createReadStream('./file.png')
       const params = {
@@ -68,6 +73,11 @@ class WhatsAppClient {
         `Unable to copy local cache  to efs, ignoring. ERR - ${err.message}`
       )
     }
+    await sendStatusUpdate({
+      eventbridge: this.eventbridge,
+      eventbridgeArn: this.eventBridgeArn,
+      detailsType: 'Connected'
+    })
     pino.info('Client is ready!')
   }
 
@@ -105,6 +115,11 @@ class WhatsAppClient {
     this.client.authStrategy.logout()
     this.client.destroy()
     fs.remove(this.efsCache)
+    await sendStatusUpdate({
+      eventbridge: this.eventbridge,
+      eventbridgeArn: this.eventBridgeArn,
+      detailsType: 'Disconnected'
+    })
     this.startListening()
     pino.info('Logged out')
   }

@@ -9,7 +9,7 @@ class WhatsAppEventHandler {
     try {
       const detailsType = event['detail-type']
       switch (detailsType) {
-        case 'WhatsApp Logout':
+        case 'logout':
           await this.whatsAppClient.logout()
           break
         default:

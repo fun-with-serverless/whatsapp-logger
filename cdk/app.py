@@ -36,7 +36,6 @@ whatsapp_listener = WhatsAppListener(
     lambda_url=admin_panel.lambda_url,
     env=env,
     event_bus=event_bus.event_bus,
-    sqs_target=event_bus.sqs_target,
 )
 
 app.synth()
