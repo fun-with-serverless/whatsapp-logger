@@ -31,4 +31,3 @@ class ApplicationState(Model):
     def update_client_status(status: ClientStatus) -> None:
         client_status = ApplicationState(key="client_status", value=status.value)
         client_status.save()
-        
