@@ -7,6 +7,9 @@ from aws_cdk import (
     aws_sns as sns,
     aws_efs as efs,
     RemovalPolicy,
+    aws_events as eb,
+    aws_sqs as sqs,
+    aws_events_targets as events_targets,
 )
 from constructs import Construct
 
@@ -21,6 +24,7 @@ class WhatsAppListener(Stack):
         whatsapp_messages: sns.Topic,
         qr_bucket: s3.Bucket,
         lambda_url: str,
+        event_bus: eb.EventBus,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -28,6 +32,7 @@ class WhatsAppListener(Stack):
         vpc = self._create_vpc()
         sg = self._create_security_group(vpc)
         file_system = self._create_efs(sg=sg, vpc=vpc)
+        sqs_target = self._define_eventbus_events(event_bus)
         self._create_ecs_cluster(
             lambda_url=lambda_url,
             whatsapp_messages=whatsapp_messages,
@@ -35,7 +40,21 @@ class WhatsAppListener(Stack):
             vpc=vpc,
             sg=sg,
             file_system=file_system,
+            sqs_target=sqs_target,
+            event_bus=event_bus,
         )
+
+    def _define_eventbus_events(self, event_bus: eb.EventBus) -> sqs.Queue:
+        queue = sqs.Queue(self, "UpdteWhatsAppListener")
+
+        eb.Rule(
+            self,
+            "LogoutEventRule",
+            event_bus=event_bus,
+            event_pattern={"detail_type": ["logout"], "source": ["admin"]},
+            targets=[events_targets.SqsQueue(queue)],
+        )
+        return queue
 
     def _create_vpc(self) -> ec2.Vpc:
         nat_gateway_provider = ec2.NatProvider.instance(
@@ -55,6 +74,8 @@ class WhatsAppListener(Stack):
         vpc: ec2.Vpc,
         sg: ec2.SecurityGroup,
         file_system: efs.FileSystem,
+        sqs_target: sqs.Queue,
+        event_bus: eb.EventBus,
     ) -> None:
         cluster = ecs.Cluster(self, "Cluster", vpc=vpc)
         fargate_task_definition = ecs.FargateTaskDefinition(
@@ -68,6 +89,8 @@ class WhatsAppListener(Stack):
                 "WHATAPP_SNS_TOPIC_ARN": whatsapp_messages.topic_arn,
                 "PERSISTANCE_STORAGE_MOUNT_POINT": EFS_MOUNT_POINT,
                 "URL_IN_MAIL": lambda_url,
+                "SQS_EVENT_URL": sqs_target.queue_url,
+                "EVENTBRIDGE_ARN": event_bus.event_bus_arn,
             },
             logging=ecs.LogDrivers.aws_logs(stream_prefix="whatsapp-listener"),
         )
@@ -82,6 +105,18 @@ class WhatsAppListener(Stack):
         fargate_task_definition.add_to_task_role_policy(
             iam.PolicyStatement(
                 actions=["s3:PutObject"], resources=[f"{qr_bucket.bucket_arn}/*"]
+            )
+        )
+        fargate_task_definition.add_to_task_role_policy(
+            iam.PolicyStatement(
+                actions=["sqs:ReceiveMessage", "sqs:DeleteMessage"],
+                resources=[sqs_target.queue_arn],
+            )
+        )
+        fargate_task_definition.add_to_task_role_policy(
+            iam.PolicyStatement(
+                actions=["events:PutEvents"],
+                resources=[event_bus.event_bus_arn],
             )
         )
 

@@ -22,6 +22,8 @@ python = "^3.9"
 [tool.poetry.group.layer.dependencies]
 boto3 = "^1.26.59"
 dacite = "^1.8.0"
+pynamodb = "^5.4.0"
+aws-lambda-powertools = "^2.8.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -33,6 +35,7 @@ moto = "^4.1.2"
 pyyaml = "^6.0"
 mypy = "^1.0.0"
 boto3-stubs = {extras = ["essential"], version = "^1.26.65"}
+ipython = "^8.10.0"
 
 [build-system]
 requires = ["poetry-core"]

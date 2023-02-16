@@ -1,3 +1,5 @@
+const pino = require('pino')()
+
 function getEnv (name) {
   const env = process.env[name]
   if (!env) {
@@ -15,46 +17,82 @@ function getEnvOrDefault (name, defaultValue) {
 }
 
 /**
- * Sends an email using the Amazon Simple Email Service (SES) client
+ * pollQueue
  *
- * @param {Object} ses - The Amazon SES client
- * @param {string} source - The email address the email will be sent from.
- * @param {string} to - The email address the email will be sent to
- * @param {string} imageUrl - The URL of an image to be included in the email
+ * @desc A function to poll messages from an SQS queue and execute events based on the message body.
  *
+ * @param {string} queueUrl - The URL of the SQS queue to poll
+ * @param {Object} sqsClient - The SQS client to use for making requests
+ * @param {WhatsAppEventHandler} eventsExecuter - The object responsible for executing events based on the message body
+ *
+ *
+ * @returns {void}
  */
-const sendEmail = async (ses, source, to, imageUrl) => {
-  // Create the email parameters
-  const params = {
-    Destination: {
-      ToAddresses: [to]
-    },
-    Message: {
-      Body: {
-        Html: {
-          Charset: 'UTF-8',
-          Data: `<html>
-            <body>
-              <p>Application is ready.<br/> <a href="${imageUrl}">Admin portal</a></p>
-            </body>
-          </html>`
-        }
-      },
-      Subject: {
-        Charset: 'UTF-8',
-        Data: 'Access WhatsApp QR code'
-      }
-    },
-    Source: source
+const pollQueue = async (queueUrl, sqsClient, eventsExecuter) => {
+  pino.info('Polling queue...')
+  try {
+    const receiveMessageResponse = await sqsClient
+      .receiveMessage({
+        QueueUrl: queueUrl,
+        MaxNumberOfMessages: 1,
+        WaitTimeSeconds: 20,
+        VisibilityTimeout: 20
+      })
+      .promise()
+
+    if (receiveMessageResponse.Messages) {
+      receiveMessageResponse.Messages.forEach(async (message) => {
+        pino.info(`Received message: ${message.Body}`)
+        const body = JSON.parse(message.Body)
+        eventsExecuter.handle(body)
+        await sqsClient
+          .deleteMessage({
+            QueueUrl: queueUrl,
+            ReceiptHandle: message.ReceiptHandle
+          })
+          .promise()
+      })
+    }
+  } catch (err) {
+    pino.error(`Unable to pull messages from queue. ERR - ${err.message}`)
   }
+  const intervalId = setTimeout(async () => {
+    await pollQueue(queueUrl, sqsClient, eventsExecuter)
+  }, 2000)
+  return intervalId
+}
 
-  // Send the email
-
-  await ses.sendEmail(params).promise()
+/**
+ * Sends a status update to the AWS EventBridge.
+ *
+ * @param {Object} options - The options object.
+ * @param {Object} options.eventbridge - The AWS EventBridge instance.
+ * @param {string} options.eventbridgeArn - The ARN of the EventBridge.
+ * @param {string} options.detailsType - The detail type of the status update.
+ * @return {Promise} - Returns a Promise that resolves when the status update is sent to the AWS EventBridge.
+ */
+const sendStatusUpdate = async ({
+  eventbridge,
+  eventbridgeArn,
+  detailsType
+}) => {
+  await eventbridge
+    .putEvents({
+      Entries: [
+        {
+          EventBusName: eventbridgeArn,
+          Source: 'whatsapp-client',
+          DetailType: 'status-change',
+          Detail: JSON.stringify({ status: detailsType })
+        }
+      ]
+    })
+    .promise()
 }
 
 module.exports = {
   getEnv,
   getEnvOrDefault,
-  sendEmail
+  pollQueue,
+  sendStatusUpdate
 }
