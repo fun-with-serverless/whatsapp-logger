@@ -3,6 +3,8 @@ from pynamodb.attributes import UnicodeAttribute
 import os
 from enum import Enum
 
+DEFAULT_APPLICATION_STATE_DB_NAME = "APPLICATION_STATE_DB_REPLACE"
+
 
 class ClientStatus(Enum):
     CONNECTED = "Connected"
@@ -18,7 +20,9 @@ class ClientStatus(Enum):
 
 class ApplicationState(Model):
     class Meta:
-        table_name = os.environ.get("APPLICATION_STATE_TABLE_NAME", "Replace")
+        table_name = os.environ.get(
+            "APPLICATION_STATE_TABLE_NAME", DEFAULT_APPLICATION_STATE_DB_NAME
+        )
 
     key = UnicodeAttribute(hash_key=True)
     value = UnicodeAttribute()

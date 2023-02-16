@@ -3,6 +3,7 @@ import boto3
 import pytest
 import base64
 import os
+from src.utils.dynamodb_models import ApplicationState
 
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"
@@ -57,6 +58,13 @@ def parameters_store(monkeypatch):
         monkeypatch.setenv("GOOGLE_SHEET_URL", param_name)
 
         yield client
+
+
+@pytest.fixture
+def application_state_db(monkeypatch):
+    with moto.mock_dynamodb():
+        ApplicationState.create_table(wait=True)
+        yield
 
 
 @pytest.fixture
