@@ -34,7 +34,7 @@ jobs:
 
     - name: Install dependencies in whatsapp-web-listener folder
       run: |
-        pushd whatsapp-web-listener
+        pushd whatsapp_web_listener
         npm install
         popd
 
