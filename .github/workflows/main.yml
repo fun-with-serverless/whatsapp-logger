@@ -28,29 +28,16 @@ jobs:
         curl -sSL https://install.python-poetry.org | python3 -
         poetry self add 'poethepoet[poetry_plugin]'
 
-    - name: Install dependencies in cdk folder
+    - name: Install dependencies
       run: |
-        pushd cdk
         poetry install
-        popd
-
-    - name: Install dependencies in googlesheets-recorder folder
-      run: |
-        pushd googlesheets-recorder
-        poetry install
-        popd
-    - name: Install dependencies in admin-panel folder
-      run: |
-        pushd admin-panel
-        poetry install
-        popd
 
     - name: Install dependencies in whatsapp-web-listener folder
       run: |
-        pushd whatsapp-web-listener
+        pushd whatsapp_web_listener
         npm install
         popd
 
     - name: Run gatekeeper script
-      run: ./scripts/gate.sh
+      run: poetry poe gate
 

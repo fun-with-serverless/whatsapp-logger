@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "WhatsApp-Logger"
+version = "0.1.0"
+description = "Serverless Backend"
+authors = ["Efi MK"]
+
+[tool.poe.tasks]
+black = "black ."
+lint = "ruff ."
+pytest = "pytest"
+mypy = "mypy ."
+deploy = "cdk deploy --all"
+destroy = "cdk destroy --all"
+client_gate = {shell = "cd whatsapp_web_listener && npm run gate && cd .."}
+gate = ["black", "lint", "pytest", "mypy", "client_gate"]
+
+[tool.ruff]
+# Never enforce `E501` (line length violations).
+ignore = ["E501"]
+exclude = [
+"cdk.out"
+]
+
+[tool.black]
+extend-exclude = '''
+
+(
+    cdk\.out 
+)
+'''
+[tool.mypy]
+exclude = [
+"cdk.out"
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.layer.dependencies]
+boto3 = "^1.26.59"
+dacite = "^1.8.0"
+pynamodb = "^5.4.0"
+aws-lambda-powertools = "^2.8.0"
+gspread = "^5.7.2"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+ruff = "^0.0.241"
+pytest = "^7.2.1"
+moto = "^4.1.2"
+pyyaml = "^6.0"
+mypy = "^1.0.0"
+boto3-stubs = {extras = ["essential"], version = "^1.26.65"}
+ipython = "^8.10.0"
+aws-cdk-lib = "^2.65.0"
+aws-cdk-aws-lambda-python-alpha = "^2.65.0a0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
