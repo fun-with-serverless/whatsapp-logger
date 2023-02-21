@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <title>WhatsApp Group Manager</title>
+  </head>
+  <body>
+    <div id="spinner-container"  style="display: none;"></div>
+    <div class="container">
+      <div id="login-form" class="form-group" style="display: block;">
+        <form>
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-control">
+          </div>
+          <input type="button" value="Submit" class="btn btn-primary" onclick="submitForm()">
+        </form>
+      </div>
+      <div id="tabs" style="display: none;">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" href="#google-sheets-config" data-toggle="tab">Google Configuration</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#whatsapp-agent-status" data-toggle="tab">WhatsApp Client Status</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div id="google-sheets-config" class="tab-pane active">
+            <form>
+              <div class="form-group">
+                <label for="google_secret">Google Secret:</label>
+                <textarea id="google_secret" name="google_secret" class="form-control" style="height: 10em"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="sheet_url">Sheet URL:</label>
+                <input type="text" id="sheet_url" name="sheet_url" class="form-control">
+              </div>
+              <div class="form-group">
+                <input type="button" value="Save" class="btn btn-success" onclick="saveConfig()">
+              </div>
+            </form>
+          </div>
+          <div id="whatsapp-agent-status" class="tab-pane">
+            <h3 class="text-center font-weight-bold" id="agent_status">NA</h3>
+            <input type="button" id="disconnect" value="Disconnect" class="btn btn-info" onclick="disconnect()">
+            <div id="image-container" class="text-center"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>

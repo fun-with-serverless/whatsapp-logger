@@ -1,18 +1,13 @@
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.event_handler import (
     LambdaFunctionUrlResolver,
-    Response,
-    content_types,
 )
 from aws_lambda_powertools.utilities import parameters
 from aws_lambda_powertools.event_handler.exceptions import (
     UnauthorizedError,
 )
 import base64
-from http import HTTPStatus
 import os
-
-from .consts import HTML_TEMPLATE
 
 logger = Logger()
 USER = "admin"
@@ -44,11 +39,7 @@ def basic_authenticate(app: LambdaFunctionUrlResolver):
                     raise UnauthorizedError("Unauthorized")
             else:
                 logger.info("Missing basic auth")
-                return Response(
-                    status_code=HTTPStatus.OK,
-                    content_type=content_types.TEXT_HTML,
-                    body=HTML_TEMPLATE,
-                )
+                raise UnauthorizedError("Unauthorized")
 
         return wrapper
 

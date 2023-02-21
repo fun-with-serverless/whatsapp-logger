@@ -65,6 +65,12 @@ class WhatsAppClient {
   }
 
   async onReady () {
+    await sendStatusUpdate({
+      eventbridge: this.eventbridge,
+      eventbridgeArn: this.eventBridgeArn,
+      detailsType: 'Connected'
+    })
+    
     try {
       await fs.copy('./local_auth', `${this.efsPath}/local_auth`)
       pino.info('Copied')
@@ -73,11 +79,7 @@ class WhatsAppClient {
         `Unable to copy local cache  to efs, ignoring. ERR - ${err.message}`
       )
     }
-    await sendStatusUpdate({
-      eventbridge: this.eventbridge,
-      eventbridgeArn: this.eventBridgeArn,
-      detailsType: 'Connected'
-    })
+    
     pino.info('Client is ready!')
   }
 

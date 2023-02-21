@@ -18,6 +18,4 @@ WhatsAppListener(
     backend.event_bus,
     env=env,
 )
-
-
 app.synth()

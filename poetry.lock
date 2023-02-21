@@ -163,6 +163,45 @@ tracer = ["aws-xray-sdk (>=2.8.0,<3.0.0)"]
 validation = ["fastjsonschema (>=2.14.5,<3.0.0)"]
 
 [[package]]
+name = "aws-solutions-constructs-aws-cloudfront-s3"
+version = "2.32.0"
+description = "CDK Constructs for AWS Cloudfront to AWS S3 integration."
+category = "dev"
+optional = false
+python-versions = "~=3.7"
+files = [
+    {file = "aws-solutions-constructs.aws-cloudfront-s3-2.32.0.tar.gz", hash = "sha256:4926654e15bec880ddd5472f4c12f8097f7d60fde6b3a79398c9a541d58cf329"},
+    {file = "aws_solutions_constructs.aws_cloudfront_s3-2.32.0-py3-none-any.whl", hash = "sha256:772de3e49314348d2c7452c34cc1568227b2c9ac4c25d88181c3f153db1898d8"},
+]
+
+[package.dependencies]
+aws-cdk-lib = ">=2.64.0,<3.0.0"
+"aws-solutions-constructs.core" = "2.32.0"
+constructs = ">=10.0.0,<11.0.0"
+jsii = ">=1.74.0,<2.0.0"
+publication = ">=0.0.3"
+typeguard = ">=2.13.3,<2.14.0"
+
+[[package]]
+name = "aws-solutions-constructs-core"
+version = "2.32.0"
+description = "Core CDK Construct for patterns library"
+category = "dev"
+optional = false
+python-versions = "~=3.7"
+files = [
+    {file = "aws-solutions-constructs.core-2.32.0.tar.gz", hash = "sha256:3a1e73bebfd89bb7248890e6950aa0bc3f53a310be4165a6afc83d8b12a6cbb3"},
+    {file = "aws_solutions_constructs.core-2.32.0-py3-none-any.whl", hash = "sha256:dcdf3878376ed685105a8eebd64dd076b3d8df7c23d945731d1f42d6484f56fc"},
+]
+
+[package.dependencies]
+aws-cdk-lib = ">=2.64.0,<3.0.0"
+constructs = ">=10.0.0,<11.0.0"
+jsii = ">=1.74.0,<2.0.0"
+publication = ">=0.0.3"
+typeguard = ">=2.13.3,<2.14.0"
+
+[[package]]
 name = "backcall"
 version = "0.2.0"
 description = "Specifications for callback functions passed in to an API"
@@ -2127,4 +2166,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "536f77184e87c5b333e9053600a7ec65f5d249bb0b124539e9493db88597a67b"
+content-hash = "681fc88a2f42cd37774b48814730a726929288c5c607714d7fee04e2cc266e2d"

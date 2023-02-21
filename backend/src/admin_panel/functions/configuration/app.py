@@ -1,6 +1,7 @@
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
-from aws_lambda_powertools.event_handler import LambdaFunctionUrlResolver, Response
+from aws_lambda_powertools.event_handler import LambdaFunctionUrlResolver, Response, CORSConfig
+
 from dacite import from_dict
 
 from ...utils.authentication import basic_authenticate
@@ -15,7 +16,7 @@ import json
 from dataclasses import dataclass, asdict
 
 logger = Logger()
-app = LambdaFunctionUrlResolver()
+app = LambdaFunctionUrlResolver(CORSConfig(allow_origin="*"))
 
 
 @dataclass(frozen=True)
