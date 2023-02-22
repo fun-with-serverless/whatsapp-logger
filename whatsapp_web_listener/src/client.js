@@ -70,7 +70,7 @@ class WhatsAppClient {
       eventbridgeArn: this.eventBridgeArn,
       detailsType: 'Connected'
     })
-    
+
     try {
       await fs.copy('./local_auth', `${this.efsPath}/local_auth`)
       pino.info('Copied')
@@ -79,7 +79,7 @@ class WhatsAppClient {
         `Unable to copy local cache  to efs, ignoring. ERR - ${err.message}`
       )
     }
-    
+
     pino.info('Client is ready!')
   }
 

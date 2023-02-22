@@ -19,7 +19,7 @@ class Dashboard(Construct):
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
-        cfs3 = CloudFrontToS3(self, "Dashboard", insert_http_security_headers = False)
+        cfs3 = CloudFrontToS3(self, "Dashboard", insert_http_security_headers=False)
         self._domain = cfs3.cloud_front_web_distribution.domain_name
         self._ws_bucket = cfs3.s3_bucket_interface
 

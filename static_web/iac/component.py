@@ -16,7 +16,9 @@ class StaticWeb(Stack):
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        destination_bucket = s3.Bucket.from_bucket_arn(self, "DestinationBucket", bucket_arn=Fn.import_value("WebBucketArn"))
+        destination_bucket = s3.Bucket.from_bucket_arn(
+            self, "DestinationBucket", bucket_arn=Fn.import_value("WebBucketArn")
+        )
         static_source = self._create_static_content(domain)
         s3deploy.BucketDeployment(
             self,

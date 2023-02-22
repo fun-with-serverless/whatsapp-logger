@@ -6,13 +6,16 @@ authors = ["Efi MK"]
 
 [tool.poe.tasks]
 black = "black ."
-lint = "ruff ."
+black_ci = "black --check ."
+lint = "ruff --fix ."
+lint_ci = "ruff ."
 pytest = "pytest"
 mypy = "mypy ."
 deploy = {shell = "cdk deploy --all && cd static_web/iac && cdk deploy --all && cd ../.."}
 destroy = {shell = "cd static_web/iac && cdk destroy --all --force && cd ../.. && cdk destroy --all --force"}
 client_gate = {shell = "cd whatsapp_web_listener && npm run gate && cd .."}
 gate = ["black", "lint", "pytest", "mypy", "client_gate"]
+gate_ci = ["black_ci", "lint_ci", "pytest", "mypy", "client_gate"]
 
 [tool.ruff]
 # Never enforce `E501` (line length violations).
