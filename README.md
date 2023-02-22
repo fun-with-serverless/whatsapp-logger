@@ -49,7 +49,7 @@ In the future, we plan to add daily summaries of the discussions, providing a qu
 ## High level architecture
 
 <div align="center">
-    <img src="https://user-images.githubusercontent.com/110536677/217332241-6a4eb1f5-67bc-42bc-b88d-4e79f5eae935.png" alt="Architecture diagram">
+    <img src="https://user-images.githubusercontent.com/110536677/220546410-6ace64d6-ce16-46c2-925c-f909731da59e.png" alt="Architecture diagram">
 </div>
 
 This architecture consists of several AWS components that work together to allow for capturing and storing data from the popular messaging application, WhatsApp. The components in the architecture include:
@@ -81,12 +81,15 @@ This architecture consists of several AWS components that work together to allow
 * Run `poetry install` to install relevant dependencies.
 * Next run the `poetry poe deploy`. It will run the CDK deployment script. Approve the deployment of the various stacks. Sit tight, it will take a couple of minutes.
 * When the installation is complete you should get two links - 1. to the admin dashboard and 2. to the admin password stored in AWS.
-![image](https://user-images.githubusercontent.com/110536677/217345457-e43cc69d-2d56-4174-9b1f-1834916bb6de.png)
+![New Project](https://user-images.githubusercontent.com/110536677/220544692-63814d36-6b3d-45f6-8f0f-22591963b724.png)
+
 
 * Get the secret password, by going to the secret manager, scroll down and click `Retrieve secret value`
 ![image](https://user-images.githubusercontent.com/110536677/217345589-d2851311-8bfc-4d37-9871-3efc33335780.png)
 
 * Go to the admin dashboard, the user name is `admin`and the password is the one you have copied.
+![image](https://user-images.githubusercontent.com/110536677/220544849-6a6f21c0-0b4f-44be-b4b2-b21008a41ef0.png)
+
 
 ### Setting up Google
 * Create a new spreadsheet in google sheet.
@@ -124,7 +127,7 @@ Here’s how to get one:
 * Now go to the admin dashboard from the previous section.
 * Paste the json into the `Google Secret` text box.
 * Copy the the spreadsheet url you created in step one and paste it into the `Sheet URL` text box.
-![image](https://user-images.githubusercontent.com/110536677/217345941-03d33d0d-d1d7-4c3b-b94f-3b6d0d9e5194.png)
+![image](https://user-images.githubusercontent.com/110536677/220545115-24cec40b-74cb-4c0f-b712-1760a4ca61a9.png)
 
 * Click save and you are done.
 
