@@ -1,3 +1,10 @@
+import os
+import json
+from dataclasses import dataclass, field
+from datetime import datetime
+import functools
+from typing import Optional
+
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities.batch import (
@@ -9,12 +16,6 @@ from aws_lambda_powertools.utilities import parameters
 import gspread  # type: ignore
 from dacite import from_dict, Config
 
-import os
-import json
-from dataclasses import dataclass, field
-from datetime import datetime
-import functools
-from typing import Optional
 
 logger = Logger()
 processor = BatchProcessor(event_type=EventType.SQS)
@@ -102,7 +103,6 @@ def _get_get_google_sheet_object() -> gspread.spreadsheet.Spreadsheet:
 
 @logger.inject_lambda_context
 def handler(event: dict, context: LambdaContext):
-
     batch = event["Records"]
     with processor(
         records=batch,

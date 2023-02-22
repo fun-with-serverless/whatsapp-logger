@@ -77,7 +77,7 @@ class Backend(Stack):
             "AdminPasswordURL",
             value=f"https://{self.region}.console.aws.amazon.com/secretsmanager/secret?name={configuration.admin_password_secret.secret_name}",
         )
-        
+
         CfnOutput(
             self,
             "DashboardURL",
