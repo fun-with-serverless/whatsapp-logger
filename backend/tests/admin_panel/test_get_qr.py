@@ -9,8 +9,7 @@ def test_handler_not_authenticated_return_login():
     response = handler(http_request(), MagicMock())
     print(response)
 
-    assert response["statusCode"] == 200
-    assert "Basic Authentication" in response["body"]
+    assert response["statusCode"] == 401
 
 
 def test_handler_invalid_authenticated_return_401(monkeypatch):

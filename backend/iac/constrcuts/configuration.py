@@ -22,7 +22,13 @@ class Configuration(Construct):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        self.admin_password = secretmanager.Secret(self, "AdminPassword")
+        self.admin_password = secretmanager.Secret(
+            self,
+            "AdminPassword",
+            generate_secret_string=secretmanager.SecretStringGenerator(
+                exclude_characters=":"
+            ),
+        )
         self.google_credentials = secretmanager.Secret(
             self,
             "GoogleCredentials",

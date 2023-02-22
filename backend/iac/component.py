@@ -2,6 +2,7 @@ from .constrcuts.state import State
 from .constrcuts.configuration import Configuration
 from .constrcuts.admin_panel import AdminPanel
 from .constrcuts.googlesheets_recorder import GoogleSheetsRecorder
+from .constrcuts.dashboard import Dashboard
 from .utils.cdk_utils import prepare_layer
 
 from constructs import Construct
@@ -28,6 +29,14 @@ class Backend(Stack):
     def qr_bucket(self) -> s3.Bucket:
         return self._state.qr_bucket
 
+    @property
+    def website_domain(self) -> str:
+        return self._dashboard.dashboard_domain
+
+    @property
+    def website_s3_bucket(self) -> s3.IBucket:
+        return self._dashboard.website_bucket
+
     def __init__(
         self,
         scope: Construct,
@@ -42,7 +51,7 @@ class Backend(Stack):
         layer = prepare_layer(
             self, layer_name="BackendLocalReq", poetry_dir="backend/admin-panel"
         )
-        panel = AdminPanel(
+        admin = AdminPanel(
             self,
             "AdminPanel",
             self._state.qr_bucket,
@@ -61,6 +70,8 @@ class Backend(Stack):
             layer,
         )
 
+        self._dashboard = Dashboard(self, "Dashboard")
+
         CfnOutput(
             self,
             "AdminPasswordURL",
@@ -69,6 +80,7 @@ class Backend(Stack):
 
         CfnOutput(
             self,
-            "AdminURL",
-            value=panel.lambda_url,
+            "BackendURL",
+            export_name="BackendURL",
+            value=admin.lambda_url,
         )

@@ -36,8 +36,8 @@ class AdminPanel(Construct):
             self,
             "Admin",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            entry="backend/src/admin_panel",
-            index="functions/configuration/app.py",
+            entry="backend/src",
+            index="admin_panel/functions/configuration/app.py",
             timeout=Duration.seconds(30),
             environment={
                 "QR_BUCKET_NAME": qr_bucket.bucket_name,
@@ -57,8 +57,8 @@ class AdminPanel(Construct):
             self,
             "UpdateStatus",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            entry="backend/src/admin_panel",
-            index="functions/agent_status/app.py",
+            entry="backend/src",
+            index="admin_panel/functions/agent_status/app.py",
             timeout=Duration.seconds(30),
             dead_letter_queue=status_dlq,
             environment={
