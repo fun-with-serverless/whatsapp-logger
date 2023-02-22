@@ -39,5 +39,5 @@ jobs:
         popd
 
     - name: Run gatekeeper script
-      run: poetry poe gate
+      run: poetry poe gate_ci
 
