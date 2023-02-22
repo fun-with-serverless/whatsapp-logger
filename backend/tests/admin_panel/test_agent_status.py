@@ -1,6 +1,6 @@
 from ...src.admin_panel.functions.agent_status.app import handler
 from unittest.mock import MagicMock
-from ...src.admin_panel.utils.dynamodb_models import ApplicationState, ClientStatus
+from backend.src.utils.dynamodb_models import ApplicationState, ClientStatus
 
 
 def test_status_arrives_update_db(application_state_db):

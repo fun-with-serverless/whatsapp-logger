@@ -3,7 +3,7 @@ import boto3
 import pytest
 import base64
 import os
-from ..src.admin_panel.utils.dynamodb_models import ApplicationState
+from backend.src.utils.dynamodb_models import ApplicationState
 
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"

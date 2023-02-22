@@ -6,7 +6,7 @@ import os
 
 from .utils import http_request
 from ..conftest import SECRET_GOOGLE_AUTH, MOCK_SHEET_URL
-from ...src.admin_panel.utils.dynamodb_models import ApplicationState, ClientStatus
+from backend.src.utils.dynamodb_models import ApplicationState, ClientStatus
 
 
 def test_get_configuration(secret_manager, parameters_store, basic_auth):
