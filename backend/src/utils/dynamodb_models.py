@@ -1,3 +1,4 @@
+from datetime import datetime
 from pynamodb.models import Model
 from pynamodb.attributes import UnicodeAttribute
 import os
@@ -26,6 +27,7 @@ class ApplicationState(Model):
 
     key = UnicodeAttribute(hash_key=True)
     value = UnicodeAttribute()
+    ttl = 
 
     @staticmethod
     def get_client_status() -> ClientStatus:
@@ -35,3 +37,14 @@ class ApplicationState(Model):
     def update_client_status(status: ClientStatus) -> None:
         client_status = ApplicationState(key="client_status", value=status.value)
         client_status.save()
+
+    @staticmethod
+    def update_new_message_arrived(when: datetime) -> None:
+        try:
+            val = ApplicationState.get(hash_key=f"day_{datetime.datetime.now().timetuple().tm_yday}")
+        except ApplicationState.DoesNotExist:
+            val = ApplicationState(f"day_{datetime.datetime.now().timetuple().tm_yday}", 0)
+            val.save()
+        
+        val.update(actions=[ApplicationState.value.set(ApplicationState.value+1)])
+        
