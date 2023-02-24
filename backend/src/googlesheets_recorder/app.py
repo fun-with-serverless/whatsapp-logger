@@ -1,3 +1,5 @@
+from ..utils.models import WhatsAppMessage
+
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities.batch import (
