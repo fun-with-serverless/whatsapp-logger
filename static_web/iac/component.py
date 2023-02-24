@@ -20,6 +20,7 @@ def get_cf_output(export_name):
 
     raise ValueError(f"Export {export_name} not found")
 
+
 class StaticWeb(Stack):
     def __init__(
         self,
@@ -47,7 +48,7 @@ class StaticWeb(Stack):
             sources=[s3deploy.Source.asset(static_source)],
             destination_bucket=destination_bucket,
             distribution=distribution,
-            distribution_paths=["/*"]
+            distribution_paths=["/*"],
         )
 
     def _create_static_content(self, domain: str) -> str:
