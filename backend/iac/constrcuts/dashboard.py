@@ -29,3 +29,10 @@ class Dashboard(Construct):
             export_name="WebBucketArn",
             value=cfs3.s3_bucket_interface.bucket_arn,
         )
+
+        CfnOutput(
+            self,
+            "DashboardDistributionId",
+            export_name="DashboardDistributionId",
+            value=cfs3.cloud_front_web_distribution.distribution_id,
+        )
