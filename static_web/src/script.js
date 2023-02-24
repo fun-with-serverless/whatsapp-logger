@@ -31,14 +31,14 @@ async function getRequest({
             xhr.setRequestHeader(key, headers[key]);
         }
         xhr.responseType = responseType;
-        xhr.onload = function() {
+        xhr.onload = function () {
             if (xhr.status === 200) {
                 resolve(xhr.response);
             } else {
                 reject(Error(xhr.statusText));
             }
         };
-        xhr.onerror = function() {
+        xhr.onerror = function () {
             reject(Error("Network Error"));
         };
         if (body) {
@@ -146,8 +146,8 @@ async function disconnect() {
     hideLoading();
 
 }
-$(document).ready(function() {
-    $('.nav-link').click(function() {
+$(document).ready(function () {
+    $('.nav-link').click(function () {
         // Remove the active class from all tabs
         $('.nav-link').removeClass('active');
         // Add the active class to the clicked tab
