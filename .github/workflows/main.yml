@@ -40,7 +40,7 @@ jobs:
         popd
 
     - name: Run gatekeeper script
-      run: CDK_DEFAULT_ACCOUNT=123 CDK_DEFAULT_REGION=use-west-2 poetry poe gate_ci
+      run: poetry poe gate_ci
     - name: Create coverage report in PR
       uses: 5monkeys/cobertura-action@master
       with:

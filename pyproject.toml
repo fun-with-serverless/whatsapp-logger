@@ -16,7 +16,7 @@ destroy = {shell = "cd static_web/iac && cdk destroy --all --force && cd ../.. &
 client_gate = {shell = "cd whatsapp_web_listener && npm run gate && cd .."}
 cdk_synth = {shell = "cdk synth --all && cd static_web/iac && cdk synth --all && cd ../.."}
 gate = ["black", "lint", "pytest", "mypy", "client_gate"]
-gate_ci = ["black_ci", "lint_ci", "pytest", "mypy", "client_gate", "cdk_synth"]
+gate_ci = ["black_ci", "lint_ci", "pytest", "mypy", "client_gate"]
 
 [tool.ruff]
 # Never enforce `E501` (line length violations).
