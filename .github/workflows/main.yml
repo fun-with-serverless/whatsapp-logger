@@ -18,6 +18,7 @@ jobs:
       with:
         node-version: 16
         cache: 'npm'
+        cache-dependency-path: whatsapp_web_listener/package-lock.json
 
     - name: Set up Poetry
       run: |
