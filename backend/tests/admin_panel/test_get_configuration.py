@@ -3,10 +3,10 @@ from unittest.mock import MagicMock
 import json
 from aws_lambda_powertools.utilities import parameters
 import os
-
+import boto3
 from .utils import http_request
 from ..conftest import SECRET_GOOGLE_AUTH, MOCK_SHEET_URL
-from ...src.admin_panel.utils.dynamodb_models import ApplicationState, ClientStatus
+from backend.src.utils.dynamodb_models import ApplicationState, ClientStatus
 
 
 def test_get_configuration(secret_manager, parameters_store, basic_auth):
@@ -55,4 +55,23 @@ def test_get_device_status(basic_auth, application_state_db, secret_manager):
 
     assert response["statusCode"] == 200
 
-    assert json.loads(response["body"]) == {"device_status": "Disconnected"}
+    assert json.loads(response["body"]) == {
+        "device_status": "Disconnected",
+        "last_message_arrived": -2208988800000,
+        "total_today": 0,
+    }
+
+
+def test_disconnect(basic_auth, secret_manager, events):
+    request = http_request(path="/disconnect", method="POST")
+
+    request["headers"]["Authorization"] = basic_auth
+
+    response = handler(request, MagicMock())
+
+    sqs_client = boto3.client("sqs")
+    sqs_response = sqs_client.receive_message(QueueUrl=events)
+    for message in sqs_response["Messages"]:
+        assert json.loads(message["Body"])["detail-type"] == "logout"
+
+    assert response["statusCode"] == 200

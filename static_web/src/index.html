@@ -31,8 +31,11 @@
           <li class="nav-item">
             <a class="nav-link" href="#whatsapp-agent-status" data-toggle="tab">WhatsApp Client Status</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#statistics" data-toggle="tab">Message Statistics</a>
+          </li>
         </ul>
-        <div class="tab-content">
+        <div class="tab-content py-4">
           <div id="google-sheets-config" class="tab-pane active">
             <form>
               <div class="form-group">
@@ -52,6 +55,28 @@
             <h3 class="text-center font-weight-bold" id="agent_status">NA</h3>
             <input type="button" id="disconnect" value="Disconnect" class="btn btn-info" onclick="disconnect()">
             <div id="image-container" class="text-center"></div>
+          </div>
+          <div id="statistics" class="tab-pane">
+            <div class="container">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Last message Arrived</h5>
+                      <p class="card-text" id="last_message_arrived_value"></p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Total Messages Today</h5>
+                      <p class="card-text" id="total_messages_today_value"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

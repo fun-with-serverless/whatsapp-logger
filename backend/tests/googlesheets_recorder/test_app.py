@@ -1,14 +1,15 @@
-import json
 import gspread  # type: ignore
 from unittest.mock import patch, MagicMock
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
+
+from backend.tests.utils import get_sqs_body
 from ...src.googlesheets_recorder.app import record_handler
 
 
 def test_record_handler():
     with patch("gspread.service_account_from_dict"):
         record = MagicMock(SQSRecord)
-        record.body = _get_body("test_group")
+        record.body = get_sqs_body("test_group")
 
         sheet = MagicMock(gspread.spreadsheet.Spreadsheet)
         worksheet = MagicMock(gspread.spreadsheet.Worksheet)
@@ -32,7 +33,7 @@ def test_record_handler():
 def test_record_handler_group_is_empty_no_row_is_appended():
     with patch("gspread.service_account_from_dict"):
         record = MagicMock(SQSRecord)
-        record.body = _get_body(" ")
+        record.body = get_sqs_body(" ")
 
         sheet = MagicMock(gspread.spreadsheet.Spreadsheet)
         worksheet = MagicMock(gspread.spreadsheet.Worksheet)
@@ -41,13 +42,3 @@ def test_record_handler_group_is_empty_no_row_is_appended():
 
         record_handler(record, sheet)
         sheet.worksheet.assert_not_called()
-
-
-def _get_body(group_name: str) -> str:
-    return json.dumps(
-        {
-            "Message": '{{"group_name": "{group_name}", "group_id": "test_id", "time": 1612081880, "message": "test_message", "participant_id": "test_participant_id", "participant_handle": "test_handle", "participant_number": "test_number", "participant_contact_name": "test_name", "has_media": false}}'.format(
-                group_name=group_name
-            )
-        }
-    )

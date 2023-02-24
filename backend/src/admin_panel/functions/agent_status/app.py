@@ -3,7 +3,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities.data_classes import event_source, EventBridgeEvent
 from dacite import from_dict
 
-from ...utils.dynamodb_models import ApplicationState, ClientStatus
+from ....utils.dynamodb_models import ApplicationState, ClientStatus
 from dataclasses import dataclass
 
 

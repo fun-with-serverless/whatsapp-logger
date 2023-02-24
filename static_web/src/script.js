@@ -60,7 +60,7 @@ async function submitForm() {
         $("#tabs").show();
         $("#google_secret").val(response.google_secret);
         $("#sheet_url").val(response.sheet_url);
-        pullDeviceStatus();
+        pullStatus();
     } catch (error) {
         console.log(error.message)
         alert("Authentication failed. Please check your username and password.");
@@ -104,7 +104,7 @@ async function showQR() {
         alert("Error in loading the QR code. Please check your username and password.");
     }
 }
-async function pullDeviceStatus() {
+async function pullStatus() {
     showLoading();
     try {
         const response = await getRequest({
@@ -120,11 +120,13 @@ async function pullDeviceStatus() {
             $("#disconnect").show();
             $("#image-container").hide();
         }
+        $("#last_message_arrived_value").html(new Date(response.last_message_arrived).toLocaleString())
+        $("#total_messages_today_value").html(response.total_today)
     } catch (error) {
         console.log(error.message)
     }
     hideLoading();
-    setTimeout(pullDeviceStatus, 5000);
+    setTimeout(pullStatus, 5000);
 }
 async function disconnect() {
     showLoading();

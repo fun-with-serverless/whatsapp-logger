@@ -3,6 +3,7 @@ from .constrcuts.configuration import Configuration
 from .constrcuts.admin_panel import AdminPanel
 from .constrcuts.googlesheets_recorder import GoogleSheetsRecorder
 from .constrcuts.dashboard import Dashboard
+from .constrcuts.message_statistics import MessageStatistics
 from .utils.cdk_utils import prepare_layer
 
 from constructs import Construct
@@ -23,7 +24,7 @@ class Backend(Stack):
 
     @property
     def whatsapp_message_sns(self) -> sns.Topic:
-        return self._recorder.whatsapp_message_sns
+        return self._whatsapp_message_sns
 
     @property
     def qr_bucket(self) -> s3.Bucket:
@@ -44,7 +45,7 @@ class Backend(Stack):
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
+        self._whatsapp_message_sns = sns.Topic(self, "whatsapp-messages")
         self._event_bus = eb.EventBus(self, "WhatsAppSystemBus")
         self._state = State(self, "State")
         configuration = Configuration(self, "Configuration")
@@ -68,16 +69,25 @@ class Backend(Stack):
             configuration.google_credentials_secret,
             configuration.sheet_url_parameter,
             layer,
+            whatsapp_messages=self._whatsapp_message_sns,
         )
 
         self._dashboard = Dashboard(self, "Dashboard")
+
+        MessageStatistics(
+            self,
+            "MessageStatistics",
+            application_state_table=self._state.state_table,
+            layer=layer,
+            whatsapp_messages=self._whatsapp_message_sns,
+        )
 
         CfnOutput(
             self,
             "AdminPasswordURL",
             value=f"https://{self.region}.console.aws.amazon.com/secretsmanager/secret?name={configuration.admin_password_secret.secret_name}",
         )
-        
+
         CfnOutput(
             self,
             "DashboardURL",
