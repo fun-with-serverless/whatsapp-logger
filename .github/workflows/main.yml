@@ -18,16 +18,16 @@ jobs:
       with:
         node-version: 16
 
+    - name: Set up Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry self add 'poethepoet[poetry_plugin]'
+        
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
         python-version: 3.9
         cache: 'poetry'
-
-    - name: Set up Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        poetry self add 'poethepoet[poetry_plugin]'
 
     - name: Install dependencies
       run: |
