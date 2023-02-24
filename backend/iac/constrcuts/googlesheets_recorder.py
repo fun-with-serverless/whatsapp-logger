@@ -26,8 +26,8 @@ class GoogleSheetsRecorder(Construct):
             self,
             "GoogleSheetRecorder",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            entry="backend/src/googlesheets_recorder",
-            index="app.py",
+            entry="backend",
+            index="src/googlesheets_recorder/app.py",
             timeout=Duration.minutes(1),
             environment={
                 "GOOGLE_SECRET_AUTH_NAME": google_credentials_secret.secret_name,

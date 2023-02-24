@@ -1,3 +1,5 @@
+from ..utils.models import WhatsAppMessage
+
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities.batch import (
@@ -11,26 +13,11 @@ from dacite import from_dict, Config
 
 import os
 import json
-from dataclasses import dataclass, field
 from datetime import datetime
 import functools
-from typing import Optional
 
 logger = Logger()
 processor = BatchProcessor(event_type=EventType.SQS)
-
-
-@dataclass(frozen=True)
-class WhatsAppMessage:
-    group_name: str
-    group_id: str
-    time: datetime
-    message: str
-    participant_id: str
-    participant_handle: str
-    participant_number: str
-    has_media: bool
-    participant_contact_name: Optional[str] = field(default="Unknown")
 
 
 def record_handler(record: SQSRecord, sheet: gspread.spreadsheet.Spreadsheet):
