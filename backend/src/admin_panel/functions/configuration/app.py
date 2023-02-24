@@ -30,8 +30,10 @@ class Configuration:
 
 
 @dataclass(frozen=True)
-class DeviceStatus:
+class Status:
     device_status: str
+    last_message_arrived: int
+    total_today: int
 
 
 @app.get("/device-status")
@@ -42,7 +44,16 @@ def get_device_status():
         status = ApplicationState.get_client_status().value
     except ApplicationState.DoesNotExist:
         pass
-    return asdict(DeviceStatus(device_status=status))
+    statistics = ApplicationState.get_message_statistics()
+    return asdict(
+        Status(
+            device_status=status,
+            last_message_arrived=int(
+                statistics.last_message_arrived.timestamp() * 1000
+            ),
+            total_today=statistics.total_today,
+        )
+    )
 
 
 @app.get("/qr-code")
@@ -60,12 +71,6 @@ def get_configuratio():
             sheet_url=parameters.get_parameter(os.environ["GOOGLE_SHEET_URL"]),
         )
     )
-
-
-@app.get("/")
-@basic_authenticate(app)
-def home():
-    return Response(status_code=200)
 
 
 @app.post("/configuration")

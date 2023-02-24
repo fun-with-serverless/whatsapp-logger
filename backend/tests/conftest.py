@@ -3,6 +3,7 @@ import boto3
 import pytest
 import base64
 import os
+import json
 from backend.src.utils.dynamodb_models import ApplicationState
 
 SECRET_STRING = "password"
@@ -78,3 +79,34 @@ def set_aws_region():
     os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
     yield
     del os.environ["AWS_DEFAULT_REGION"]
+
+
+@pytest.fixture
+def events(monkeypatch):
+    with moto.mock_events():
+        with moto.mock_sqs():
+            monkeypatch.setenv("EVENT_BUS_ARN", "EventBus")
+            events_client = boto3.client("events")
+            events_client.create_event_bus(Name="EventBus")
+
+            events_client.put_rule(
+                Name="MyNewRule",
+                EventPattern=json.dumps(
+                    {"source": ["admin"], "detail-type": ["logout"]}
+                ),
+                State="ENABLED",
+                EventBusName="EventBus",
+            )
+
+            sqs_client = boto3.client("sqs")
+
+            queue_url = sqs_client.create_queue(QueueName="MyNewQueue")["QueueUrl"]
+
+            queue_arn = sqs_client.get_queue_attributes(
+                QueueUrl=queue_url, AttributeNames=["QueueArn"]
+            )["Attributes"]["QueueArn"]
+            events_client.put_targets(
+                Rule="MyNewRule", Targets=[{"Id": "MyNewTarget", "Arn": queue_arn}]
+            )
+
+            yield queue_url

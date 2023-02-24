@@ -11,7 +11,7 @@ lint = "ruff --fix ."
 lint_ci = "ruff ."
 pytest = "pytest"
 mypy = "mypy ."
-deploy = {shell = "cdk deploy --all && cd static_web/iac && cdk deploy --all && cd ../.."}
+deploy = {shell = "cdk deploy --all --concurrency 2 --method=direct && cd static_web/iac && cdk deploy --all --method=direct && cd ../.."}
 destroy = {shell = "cd static_web/iac && cdk destroy --all --force && cd ../.. && cdk destroy --all --force"}
 client_gate = {shell = "cd whatsapp_web_listener && npm run gate && cd .."}
 gate = ["black", "lint", "pytest", "mypy", "client_gate"]
@@ -36,6 +36,9 @@ exclude = [
 "cdk.out"
 ]
 
+[tool.pytest.ini_options]
+addopts = "--ignore=cdk.out --cov=backend.src --cov-report xml:coverage.xml  --cov-report term"
+
 [tool.poetry.dependencies]
 python = "^3.9"
 
@@ -59,6 +62,8 @@ ipython = "^8.10.0"
 aws-cdk-lib = "^2.65.0"
 aws-cdk-aws-lambda-python-alpha = "^2.65.0a0"
 aws-solutions-constructs-aws-cloudfront-s3 = "^2.32.0"
+coverage = "^7.2.0"
+pytest-cov = "^4.0.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -19,7 +19,7 @@ class WhatsAppMessage:
     participant_contact_name: Optional[str] = field(default="Unknown")
 
     @staticmethod
-    def from_json(raw_message:str) -> "WhatsAppMessage":
+    def from_json(raw_message: str) -> "WhatsAppMessage":
         def converter(val):
             return datetime.fromtimestamp(val)
 
