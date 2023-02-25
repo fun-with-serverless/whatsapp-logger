@@ -55,7 +55,7 @@ jobs:
     - name: Run gatekeeper script
       run: poetry poe gate_ci
     - name: Create coverage report in PR
-        uses: 5monkeys/cobertura-action@master
-        with:
-          minimum_coverage: 75
+      uses: 5monkeys/cobertura-action@master
+      with:
+        minimum_coverage: 75
 
