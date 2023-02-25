@@ -8,6 +8,11 @@ on:
 jobs:
   gatekeeper:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      checks: write
 
     steps:
     - name: Checkout code
@@ -20,6 +25,12 @@ jobs:
         cache: 'npm'
         cache-dependency-path: whatsapp_web_listener/package-lock.json
 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-region: us-east-1
+        role-to-assume: arn:aws:iam::201893381538:role/GitHubRole
+        role-session-name: GitHubActionsSession
     - name: Set up Poetry
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
