@@ -24,7 +24,7 @@ jobs:
         cache-dependency-path: whatsapp_web_listener/package-lock.json
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1-node16
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-region: us-east-1
         role-to-assume: arn:aws:iam::201893381538:role/GitHubRolee
