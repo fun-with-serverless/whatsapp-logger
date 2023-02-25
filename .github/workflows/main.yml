@@ -27,7 +27,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-region: us-east-1
-        role-to-assume: arn:aws:iam::201893381538:role/GitHubRolee
+        role-to-assume: arn:aws:iam::201893381538:role/GitHubRole
         role-session-name: GitHubActionsSession
     - name: Set up Poetry
       run: |
