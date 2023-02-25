@@ -11,7 +11,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      repo:write
+      pull-requests: write
 
     steps:
     - name: Checkout code
