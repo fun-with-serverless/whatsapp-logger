@@ -14,6 +14,10 @@ class State(Construct):
     def qr_bucket(self) -> s3.Bucket:
         return self._bucket
 
+    @property
+    def chats_lake(self) -> s3.Bucket:
+        return self._chats_lake
+
     def __init__(
         self,
         scope: Construct,
@@ -32,3 +36,4 @@ class State(Construct):
         )
 
         self._bucket = s3.Bucket(self, "QRImage")
+        self._chats_lake = s3.Bucket(self, "ChatsLake")

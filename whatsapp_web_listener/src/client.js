@@ -98,7 +98,7 @@ class WhatsAppClient {
         message: message.body,
         has_media: message.hasMedia
       }
-
+      pino.info(chat.id)
       pino.info(message)
 
       await this.sns

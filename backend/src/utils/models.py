@@ -18,6 +18,15 @@ class WhatsAppMessage:
     has_media: bool
     participant_contact_name: Optional[str] = field(default="Unknown")
 
+    @property
+    def participant_name(self) -> str:
+        return (
+            self.participant_contact_name
+            if self.participant_contact_name
+            and self.participant_contact_name != "Unknown"
+            else self.participant_handle
+        )
+
     @staticmethod
     def from_json(raw_message: str) -> "WhatsAppMessage":
         def converter(val):

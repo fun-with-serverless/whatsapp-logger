@@ -6,6 +6,7 @@ import os
 import json
 from backend.src.utils.dynamodb_models import ApplicationState
 
+
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"
 USER = "admin"
