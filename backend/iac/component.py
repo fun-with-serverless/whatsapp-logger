@@ -1,3 +1,4 @@
+from .constrcuts.chatgpt_integration import ChatGPTIntegration
 from .constrcuts.state import State
 from .constrcuts.configuration import Configuration
 from .constrcuts.admin_panel import AdminPanel
@@ -80,6 +81,16 @@ class Backend(Stack):
             application_state_table=self._state.state_table,
             layer=layer,
             whatsapp_messages=self._whatsapp_message_sns,
+        )
+
+        ChatGPTIntegration(
+            self,
+            "ChatGPTIntegation",
+            self._state.chats_lake,
+            layer=layer,
+            whatsapp_messages=self.whatsapp_message_sns,
+            chatgpt_key=configuration.openai_key_secret,
+            event_bus=self.event_bus,
         )
 
         CfnOutput(

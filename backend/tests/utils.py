@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 
 def get_sqs_body(group_name: str, epoch_time: int = 1612081880) -> str:
@@ -9,3 +10,12 @@ def get_sqs_body(group_name: str, epoch_time: int = 1612081880) -> str:
             )
         }
     )
+
+
+class MockOpenAi:
+    api_key: str
+
+    class ChatCompletion:
+        @classmethod
+        def create(cls, model: str, messages: List[dict]):
+            return {"choices": [{"message": {"content": "haaa"}}]}

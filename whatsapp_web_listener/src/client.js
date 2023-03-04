@@ -45,6 +45,12 @@ class WhatsAppClient {
     this.client.initialize()
   }
 
+  async sendMeMessage (message) {
+    const meId = this.client.info.wid
+    await this.client.sendMessage(`${meId.user}@${meId.server}`, message)
+    pino.info('Message successfuly sent to self')
+  }
+
   async onQr (qr) {
     pino.info('QR code generated.')
     await sendStatusUpdate({
@@ -85,6 +91,8 @@ class WhatsAppClient {
 
   async onMessage (message) {
     try {
+      pino.info(this.client.info.wid)
+      pino.info(message.from)
       const chat = await message.getChat()
       const contact = await message.getContact()
       message = {
@@ -98,7 +106,7 @@ class WhatsAppClient {
         message: message.body,
         has_media: message.hasMedia
       }
-
+      pino.info(chat.id)
       pino.info(message)
 
       await this.sns

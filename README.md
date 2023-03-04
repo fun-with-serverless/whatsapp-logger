@@ -48,7 +48,7 @@ In the future, we plan to add daily summaries of the discussions, providing a qu
 ## High level architecture
 
 <div align="center">
-    <img src="https://user-images.githubusercontent.com/110536677/221289336-5f4e941e-bde8-4622-b42c-936c3ed93698.png" alt="Architecture diagram">
+    <img src="https://user-images.githubusercontent.com/110536677/222930399-eab3eb13-5ee7-4426-bb8d-2034b7acf873.png" alt="Architecture diagram">
 </div>
 
 This architecture consists of several AWS components that work together to allow for capturing and storing data from the popular messaging application, WhatsApp. The components in the architecture include:

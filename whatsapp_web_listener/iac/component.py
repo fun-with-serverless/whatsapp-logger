@@ -52,6 +52,14 @@ class WhatsAppListener(Stack):
             event_pattern={"detail_type": ["logout"], "source": ["admin"]},
             targets=[events_targets.SqsQueue(queue)],
         )
+
+        eb.Rule(
+            self,
+            "SummaryEvent",
+            event_bus=event_bus,
+            event_pattern={"detail_type": ["summary"], "source": ["chatgpt"]},
+            targets=[events_targets.SqsQueue(queue)],
+        )
         return queue
 
     def _create_vpc(self) -> ec2.Vpc:
@@ -87,6 +95,7 @@ class WhatsAppListener(Stack):
                 "PERSISTANCE_STORAGE_MOUNT_POINT": EFS_MOUNT_POINT,
                 "SQS_EVENT_URL": sqs_target.queue_url,
                 "EVENTBRIDGE_ARN": event_bus.event_bus_arn,
+                "ECS_CONTAINER_STOP_TIMEOUT": "5s",
             },
             logging=ecs.LogDrivers.aws_logs(stream_prefix="whatsapp-listener"),
         )
