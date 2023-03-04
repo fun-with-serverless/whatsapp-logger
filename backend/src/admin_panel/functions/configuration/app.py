@@ -27,6 +27,7 @@ app = LambdaFunctionUrlResolver(CORSConfig(allow_origin="*"))
 class Configuration:
     google_secret: str
     sheet_url: str
+    openai_key: str
 
 
 @dataclass(frozen=True)
@@ -69,6 +70,7 @@ def get_configuratio():
         Configuration(
             google_secret=parameters.get_secret(os.environ["GOOGLE_SECRET_AUTH_NAME"]),
             sheet_url=parameters.get_parameter(os.environ["GOOGLE_SHEET_URL"]),
+            openai_key=parameters.get_secret(os.environ["OPENAI_KEY"]),
         )
     )
 
@@ -80,6 +82,9 @@ def set_configuratio():
     secret = _get_secret_manager()
     secret.update_secret(
         SecretId=os.environ["GOOGLE_SECRET_AUTH_NAME"], SecretString=conf.google_secret
+    )
+    secret.update_secret(
+        SecretId=os.environ["OPENAI_KEY"], SecretString=conf.openai_key
     )
     ssm = _get_ssm()
     ssm.put_parameter(

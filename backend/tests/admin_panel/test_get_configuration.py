@@ -5,7 +5,7 @@ from aws_lambda_powertools.utilities import parameters
 import os
 import boto3
 from .utils import http_request
-from ..conftest import SECRET_GOOGLE_AUTH, MOCK_SHEET_URL
+from ..conftest import OPENAI_KEY, SECRET_GOOGLE_AUTH, MOCK_SHEET_URL
 from backend.src.utils.dynamodb_models import ApplicationState, ClientStatus
 
 
@@ -19,6 +19,7 @@ def test_get_configuration(secret_manager, parameters_store, basic_auth):
     assert json.loads(response["body"]) == {
         "google_secret": SECRET_GOOGLE_AUTH,
         "sheet_url": MOCK_SHEET_URL,
+        "openai_key": OPENAI_KEY,
     }
 
 
@@ -26,7 +27,13 @@ def test_post_configuration(secret_manager, parameters_store, basic_auth):
     request = http_request(
         path="/configuration",
         method="POST",
-        body=json.dumps({"google_secret": "new auth", "sheet_url": "new url"}),
+        body=json.dumps(
+            {
+                "google_secret": "new auth",
+                "sheet_url": "new url",
+                "openai_key": "!Q!W@E#",
+            }
+        ),
     )
     request["headers"]["Authorization"] = basic_auth
 
@@ -41,6 +48,9 @@ def test_post_configuration(secret_manager, parameters_store, basic_auth):
     assert (
         parameters.get_parameter(os.environ["GOOGLE_SHEET_URL"], force_fetch=True)
         == "new url"
+    )
+    assert (
+        parameters.get_secret(os.environ["OPENAI_KEY"], force_fetch=True) == "!Q!W@E#"
     )
 
 

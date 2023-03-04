@@ -29,6 +29,7 @@ class AdminPanel(Construct):
         event_bus: eb.EventBus,
         application_state_table: dynamodb.Table,
         layer: lambda_python.PythonLayerVersion,
+        openai_key: secretmanager.Secret,
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
@@ -44,6 +45,7 @@ class AdminPanel(Construct):
                 "SECRETAUTH_PARAM_NAME": admin_password_secret.secret_name,
                 "QR_FILE_PATH": "qr.png",
                 "GOOGLE_SECRET_AUTH_NAME": google_credentials_secret.secret_name,
+                "OPENAI_KEY": openai_key.secret_name,
                 "GOOGLE_SHEET_URL": sheet_url_parameter.parameter_name,
                 "EVENT_BUS_ARN": event_bus.event_bus_arn,
                 "APPLICATION_STATE_TABLE_NAME": application_state_table.table_name,
@@ -74,6 +76,8 @@ class AdminPanel(Construct):
         qr_bucket.grant_read(qr_lambda)
         admin_password_secret.grant_read(qr_lambda)
         admin_password_secret.grant_write(qr_lambda)
+        openai_key.grant_read(qr_lambda)
+        openai_key.grant_write(qr_lambda)
         google_credentials_secret.grant_read(qr_lambda)
         google_credentials_secret.grant_write(qr_lambda)
         sheet_url_parameter.grant_read(qr_lambda)
