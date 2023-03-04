@@ -34,15 +34,18 @@ def secret_manager(monkeypatch):
         # Create a secret in Secrets Manager
         secret_name = "secret"
         google_secret_auth_name = "google_secret_auth_name"
+        openai_secret = "openai_secret"
 
         client.create_secret(Name=secret_name, SecretString=SECRET_STRING)
         client.create_secret(
             Name=google_secret_auth_name, SecretString=SECRET_GOOGLE_AUTH
         )
+        client.create_secret(Name=openai_secret, SecretString="!@#$%")
 
         monkeypatch.setenv("LOGIN_USER", "admin")
         monkeypatch.setenv("SECRETAUTH_PARAM_NAME", secret_name)
         monkeypatch.setenv("GOOGLE_SECRET_AUTH_NAME", google_secret_auth_name)
+        monkeypatch.setenv("OPENAI_KEY", openai_secret)
 
         yield client
 
@@ -80,6 +83,13 @@ def set_aws_region():
     os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
     yield
     del os.environ["AWS_DEFAULT_REGION"]
+
+
+@pytest.fixture
+def bucket_name_env(monkeypatch):
+    name = "bucket"
+    monkeypatch.setenv("CHATS_BUCKET", name)
+    yield name
 
 
 @pytest.fixture

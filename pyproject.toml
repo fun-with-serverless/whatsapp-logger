@@ -49,6 +49,7 @@ dacite = "^1.8.0"
 pynamodb = "^5.4.0"
 aws-lambda-powertools = "^2.8.0"
 gspread = "^5.7.2"
+openai = "^0.27.0"
 
 
 [tool.poetry.group.dev.dependencies]

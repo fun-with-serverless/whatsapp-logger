@@ -5,22 +5,22 @@ import pytest
 from dataclasses import asdict
 import json
 from unittest.mock import MagicMock
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from ...src.chatgpt_integration.functions.summerize_chats.app import handler
 from backend.src.utils.models import WhatsAppMessage
 
 
 @pytest.fixture
-def s3_chats(monkeypatch):
+def s3_chats(bucket_name_env):
     def to_epoch(val: datetime) -> int:
         return int(val.timestamp())
 
     with moto.mock_s3():
         # set up the mock S3 environment
         conn = boto3.client("s3")
-        conn.create_bucket(Bucket="bucket")
-        now = datetime.now(tz=timezone.utc)
-        message = WhatsAppMessage(
+        conn.create_bucket(Bucket=bucket_name_env)
+        yesterday = datetime.now(tz=timezone.utc) - timedelta(days=1)
+        message1 = WhatsAppMessage(
             "test",
             "group-id",
             datetime(year=2023, month=1, day=10, hour=23, minute=23),
@@ -30,13 +30,30 @@ def s3_chats(monkeypatch):
             participant_number="123456",
             has_media=False,
         )
-        conn.put_object(
-            Bucket="bucket",
-            Key=f"{now.strftime('%Y.%m.%d')}/random_file",
-            Body=f"{json.dumps(asdict(message), default=to_epoch)}\n",
+
+        message2 = WhatsAppMessage(
+            "test",
+            "group-id",
+            datetime(year=2023, month=1, day=10, hour=23, minute=24),
+            "Hi",
+            "participant-id",
+            participant_handle="Efi",
+            participant_number="123456",
+            has_media=False,
         )
 
-        monkeypatch.setenv("CHATS_BUCKET", "bucket")
+        conn.put_object(
+            Bucket=bucket_name_env,
+            Key=f"{yesterday.strftime('%Y.%m.%d')}/random_file1",
+            Body=f"{json.dumps(asdict(message1), default=to_epoch)}\n",
+        )
+
+        conn.put_object(
+            Bucket=bucket_name_env,
+            Key=f"{yesterday.strftime('%Y.%m.%d')}/random_file2",
+            Body=f"{json.dumps(asdict(message2), default=to_epoch)}\n",
+        )
+
         yield conn
 
 
@@ -51,5 +68,5 @@ def test_successful_chatgpt_summerize_creation(s3_chats):
 
     assert (
         content
-        == '{"group_name": "group-id-test", "chats": "2023-01-10 23:23:00$$Efi$$Hello"}'
+        == '{"group_name": "test", "group_id": "group-id", "chats": "Efi said Hello\\nEfi said Hi"}'
     )

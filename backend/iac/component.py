@@ -89,6 +89,8 @@ class Backend(Stack):
             self._state.chats_lake,
             layer=layer,
             whatsapp_messages=self.whatsapp_message_sns,
+            chatgpt_key=configuration.openai_key_secret,
+            event_bus=self.event_bus,
         )
 
         CfnOutput(
