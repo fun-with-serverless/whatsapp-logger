@@ -9,6 +9,7 @@ from backend.src.utils.dynamodb_models import ApplicationState
 
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"
+OPENAI_KEY = "!@#$%"
 USER = "admin"
 MOCK_SHEET_URL = "https://google_sheet.com"
 
@@ -40,7 +41,7 @@ def secret_manager(monkeypatch):
         client.create_secret(
             Name=google_secret_auth_name, SecretString=SECRET_GOOGLE_AUTH
         )
-        client.create_secret(Name=openai_secret, SecretString="!@#$%")
+        client.create_secret(Name=openai_secret, SecretString=OPENAI_KEY)
 
         monkeypatch.setenv("LOGIN_USER", "admin")
         monkeypatch.setenv("SECRETAUTH_PARAM_NAME", secret_name)

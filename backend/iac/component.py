@@ -62,7 +62,8 @@ class Backend(Stack):
             configuration.sheet_url_parameter,
             self._event_bus,
             self._state.state_table,
-            layer,
+            layer=layer,
+            openai_key=configuration.openai_key_secret,
         )
         self._recorder = GoogleSheetsRecorder(
             self,

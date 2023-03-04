@@ -58,8 +58,16 @@ async function submitForm() {
         });
         $("#login-form").hide();
         $("#tabs").show();
-        $("#google_secret").val(response.google_secret);
-        $("#sheet_url").val(response.sheet_url);
+        if (response.google_secret !== "Replace") {
+            $("#google_secret").val(response.google_secret);
+        }
+        if (response.sheet_url !== "Replace") {
+            $("#sheet_url").val(response.sheet_url);
+        }
+        if (response.openai_key !== "Replace") {
+            $("#openai_key").val(response.openai_key);
+        }
+        
         pullStatus();
     } catch (error) {
         console.log(error.message)
@@ -78,7 +86,8 @@ async function saveConfig() {
             },
             body: JSON.stringify({
                 google_secret: $("#google_secret").val(),
-                sheet_url: $("#sheet_url").val()
+                sheet_url: $("#sheet_url").val(),
+                openai_key: $("#openai_key").val()
             })
         })
         alert("Config saved successfully");
