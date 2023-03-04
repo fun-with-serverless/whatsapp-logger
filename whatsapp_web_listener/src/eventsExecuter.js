@@ -12,6 +12,8 @@ class WhatsAppEventHandler {
         case 'logout':
           await this.whatsAppClient.logout()
           break
+        case 'summary':
+          break
         default:
           pino.error('Invalid option selected')
           break

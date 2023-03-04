@@ -85,6 +85,8 @@ class WhatsAppClient {
 
   async onMessage (message) {
     try {
+      pino.info(this.client.info.wid)
+      pino.info(message.from)
       const chat = await message.getChat()
       const contact = await message.getContact()
       message = {
