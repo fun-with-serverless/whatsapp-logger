@@ -10,7 +10,6 @@ from aws_cdk import (
     aws_events as eb,
     aws_sqs as sqs,
     aws_events_targets as events_targets,
-    Duration
 )
 from constructs import Construct
 
@@ -96,7 +95,7 @@ class WhatsAppListener(Stack):
                 "PERSISTANCE_STORAGE_MOUNT_POINT": EFS_MOUNT_POINT,
                 "SQS_EVENT_URL": sqs_target.queue_url,
                 "EVENTBRIDGE_ARN": event_bus.event_bus_arn,
-                "ECS_CONTAINER_STOP_TIMEOUT": "5s"
+                "ECS_CONTAINER_STOP_TIMEOUT": "5s",
             },
             logging=ecs.LogDrivers.aws_logs(stream_prefix="whatsapp-listener"),
         )
@@ -144,7 +143,7 @@ class WhatsAppListener(Stack):
             "Service",
             cluster=cluster,
             task_definition=fargate_task_definition,
-            security_groups=[sg]
+            security_groups=[sg],
         )
 
     def _create_efs(self, vpc: ec2.Vpc, sg: ec2.SecurityGroup) -> efs.FileSystem:

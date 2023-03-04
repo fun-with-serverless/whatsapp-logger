@@ -45,6 +45,12 @@ class WhatsAppClient {
     this.client.initialize()
   }
 
+  async sendMeMessage (message) {
+    const meId = this.client.info.wid
+    await this.client.sendMessage(`${meId.user}@${meId.server}`, message)
+    pino.info('Message successfuly sent to self')
+  }
+
   async onQr (qr) {
     pino.info('QR code generated.')
     await sendStatusUpdate({

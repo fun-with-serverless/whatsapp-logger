@@ -12,8 +12,14 @@ class WhatsAppEventHandler {
         case 'logout':
           await this.whatsAppClient.logout()
           break
-        case 'summary':
+        case 'summary': {
+          const message = event.detail.content
+          const groupName = event.detail.group_name
+          await this.whatsAppClient.sendMeMessage(
+            `🏁 ${groupName} summary:\n${message}`
+          )
           break
+        }
         default:
           pino.error('Invalid option selected')
           break
