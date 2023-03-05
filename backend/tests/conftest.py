@@ -4,6 +4,7 @@ import pytest
 import base64
 import os
 import json
+from backend.src.chatgpt_integration.utils.consts import SUMMARY_PREFIX
 from backend.src.utils.dynamodb_models import ApplicationState
 
 
@@ -122,3 +123,20 @@ def events(monkeypatch):
             )
 
             yield queue_url
+
+
+@pytest.fixture
+def s3_chats(bucket_name_env):
+    with moto.mock_s3():
+        # set up the mock S3 environment
+        conn = boto3.client("s3")
+        conn.create_bucket(Bucket=bucket_name_env)
+
+        file_name = f"{SUMMARY_PREFIX}/random_file1.json"
+        conn.put_object(
+            Bucket=bucket_name_env,
+            Key=file_name,
+            Body=f"{json.dumps({'group_name': 'gorup-name', 'group_id': 'group-id', 'chats': 'result is' })}",
+        )
+
+        yield conn, file_name
