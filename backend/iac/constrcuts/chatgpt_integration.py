@@ -120,6 +120,7 @@ class ChatGPTIntegration(Construct):
         chats_bucket.grant_put(summerize_chats)
         chats_bucket.grant_put(delete_buckup)
         chats_bucket.grant_delete(delete_buckup)
+        chats_bucket.grant_read(delete_buckup)
         chats_bucket.grant_read(summerize_chats)
         chats_bucket.grant_read(chatgpt_call)
 
