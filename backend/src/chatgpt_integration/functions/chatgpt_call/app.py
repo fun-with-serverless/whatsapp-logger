@@ -41,7 +41,9 @@ def handler(event, context: LambdaContext):
         ],
     )
     logger.info(
-        "ChatGPT summary", gpt_reponse=response["choices"][0]["message"]["content"]
+        "ChatGPT summary",
+        gpt_reponse=response["choices"][0]["message"]["content"],
+        gorup_name=summary["group_name"],
     )
     return {
         "content": response["choices"][0]["message"]["content"],

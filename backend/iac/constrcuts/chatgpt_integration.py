@@ -81,7 +81,22 @@ class ChatGPTIntegration(Construct):
             },
         )
 
-        state_machine = self._build_stf(summerize_chats, chatgpt_call, event_bus)
+        delete_buckup = lambda_python.PythonFunction(
+            self,
+            "DeleteOldChats",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            entry="backend",
+            index="src/chatgpt_integration/functions/delete_old_summary/app.py",
+            timeout=Duration.seconds(60),
+            layers=[layer],
+            environment={
+                "CHATS_BUCKET": chats_bucket.bucket_name,
+            },
+        )
+
+        state_machine = self._build_stf(
+            summerize_chats, chatgpt_call, delete_buckup, event_bus
+        )
 
         schedule_expression = events.Schedule.expression(
             "cron(0 1 * * ? *)"
@@ -90,12 +105,22 @@ class ChatGPTIntegration(Construct):
             self,
             "MyScheduledRule",
             schedule=schedule_expression,
-            targets=[targets.SfnStateMachine(machine=state_machine)],
+            targets=[
+                targets.SfnStateMachine(
+                    machine=state_machine,
+                    input=events.RuleTargetInput.from_object(
+                        {"bucket": chats_bucket.bucket_name}
+                    ),
+                )
+            ],
         )
 
         ds.grant_put_records(write_chats_to_s3)
         chatgpt_key.grant_read(chatgpt_call)
         chats_bucket.grant_put(summerize_chats)
+        chats_bucket.grant_put(delete_buckup)
+        chats_bucket.grant_delete(delete_buckup)
+        chats_bucket.grant_read(delete_buckup)
         chats_bucket.grant_read(summerize_chats)
         chats_bucket.grant_read(chatgpt_call)
 
@@ -105,6 +130,7 @@ class ChatGPTIntegration(Construct):
         self,
         summerize_chats: lambda_python.PythonFunction,
         chatgpt_call: lambda_python.PythonFunction,
+        delete_buckup: lambda_python.PythonFunction,
         event_bus: events.EventBus,
     ) -> sfn.StateMachine:
         summerize_step = sfn_tasks.LambdaInvoke(
@@ -117,6 +143,12 @@ class ChatGPTIntegration(Construct):
             self,
             "Send to ChatGPT",
             lambda_function=chatgpt_call,
+        )
+
+        delete_and_backup_step = sfn_tasks.LambdaInvoke(
+            self,
+            "Backup chats and delete old ones",
+            lambda_function=delete_buckup,
         )
 
         send_to_eventbridge = sfn_tasks.EventBridgePutEvents(
@@ -140,7 +172,7 @@ class ChatGPTIntegration(Construct):
 
         map.iterator(send_to_chatgpt.next(send_to_eventbridge))
 
-        definition = summerize_step.next(map).next(success)
+        definition = summerize_step.next(map).next(delete_and_backup_step).next(success)
         return sfn.StateMachine(
             self,
             "SendToChatGPT",

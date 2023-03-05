@@ -11,13 +11,14 @@ import boto3
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
+from ...utils.consts import SUMMARY_PREFIX
+
 if TYPE_CHECKING:
     from mypy_boto3_s3.service_resource import Bucket
 
 from ....utils.models import WhatsAppMessage
 
 logger = Logger()
-SUMMARY_PREFIX = "chats_for_gpt"
 
 
 @dataclass(frozen=True)
