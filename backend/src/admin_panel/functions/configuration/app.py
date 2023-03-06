@@ -9,7 +9,7 @@ from aws_lambda_powertools.event_handler import (
 from dacite import from_dict
 
 from ....utils.authentication import basic_authenticate
-from ....utils.dynamodb_models import ApplicationState, ClientStatus
+from ....utils.db_models.application_state import ApplicationState, ClientStatus
 from aws_lambda_powertools.utilities import parameters
 import boto3
 

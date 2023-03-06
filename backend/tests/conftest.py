@@ -5,7 +5,7 @@ import base64
 import os
 import json
 from backend.src.chatgpt_integration.utils.consts import SUMMARY_PREFIX
-from backend.src.utils.dynamodb_models import ApplicationState
+from backend.src.utils.db_models.application_state import ApplicationState
 
 
 SECRET_STRING = "password"

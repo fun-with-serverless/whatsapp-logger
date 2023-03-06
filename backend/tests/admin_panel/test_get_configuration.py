@@ -6,7 +6,7 @@ import os
 import boto3
 from .utils import http_request
 from ..conftest import OPENAI_KEY, SECRET_GOOGLE_AUTH, MOCK_SHEET_URL
-from backend.src.utils.dynamodb_models import ApplicationState, ClientStatus
+from backend.src.utils.db_models.application_state import ApplicationState, ClientStatus
 
 
 def test_get_configuration(secret_manager, parameters_store, basic_auth):

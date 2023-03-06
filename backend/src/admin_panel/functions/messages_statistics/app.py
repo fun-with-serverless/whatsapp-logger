@@ -9,7 +9,7 @@ from aws_lambda_powertools.utilities.batch import (
 )
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
 
-from ....utils.dynamodb_models import ApplicationState
+from ....utils.db_models.application_state import ApplicationState
 from ....utils.models import WhatsAppMessage
 
 

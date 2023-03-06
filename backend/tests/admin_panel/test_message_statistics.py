@@ -2,7 +2,7 @@ from datetime import datetime
 import time
 from unittest.mock import MagicMock
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
-from backend.src.utils.dynamodb_models import ApplicationState
+from backend.src.utils.db_models.application_state import ApplicationState
 
 from backend.tests.utils import get_sqs_body
 from ...src.admin_panel.functions.messages_statistics.app import record_handler
