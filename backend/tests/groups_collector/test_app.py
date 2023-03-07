@@ -1,18 +1,10 @@
-import os
 from unittest.mock import MagicMock
-from ...src.chatgpt_integration.functions.groups_collector.app import handler
+from ...src.groups_collector.app import handler
+from backend.src.utils.db_models.whatsapp_groups import WhatsAppGroup
 
 
-def test_successful_group_collection(s3_raw_lake):
+def test_successful_chatgpt_summerize_creation(s3_raw_lake, group_db):
     handler({}, MagicMock())
 
-    response = s3_chats.get_object(
-        Bucket=os.environ["CHATS_BUCKET"], Key="chats_for_gpt/group-id-test.json"
-    )
-
-    content = response["Body"].read().decode("utf-8")
-
-    assert (
-        content
-        == '{"group_name": "test", "group_id": "group-id", "chats": "Efi said Hello\\nEfi said Hi"}'
-    )
+    groups = WhatsAppGroup.scan()
+    assert list(groups)[0].id == "group-id"

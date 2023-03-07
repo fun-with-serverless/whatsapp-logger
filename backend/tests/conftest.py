@@ -1,3 +1,5 @@
+from dataclasses import asdict
+from datetime import datetime, timedelta, timezone
 import moto  # type: ignore
 import boto3
 import pytest
@@ -7,6 +9,7 @@ import json
 from backend.src.chatgpt_integration.utils.consts import SUMMARY_PREFIX
 from backend.src.utils.db_models.application_state import ApplicationState
 from backend.src.utils.db_models.whatsapp_groups import WhatsAppGroup
+from backend.src.utils.models import WhatsAppMessage
 
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"
