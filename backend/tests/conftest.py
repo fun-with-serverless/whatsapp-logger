@@ -6,7 +6,7 @@ import os
 import json
 from backend.src.chatgpt_integration.utils.consts import SUMMARY_PREFIX
 from backend.src.utils.db_models.application_state import ApplicationState
-
+from backend.src.utils.db_models.whatsapp_groups import WhatsAppGroup
 
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"
@@ -71,6 +71,13 @@ def parameters_store(monkeypatch):
 def application_state_db(monkeypatch):
     with moto.mock_dynamodb():
         ApplicationState.create_table(wait=True)
+        yield
+
+
+@pytest.fixture
+def group_db(monkeypatch):
+    with moto.mock_dynamodb():
+        WhatsAppGroup.create_table(wait=True)
         yield
 
 
@@ -140,3 +147,50 @@ def s3_chats(bucket_name_env):
         )
 
         yield conn, file_name
+
+
+@pytest.fixture
+def s3_raw_lake(bucket_name_env):
+    def to_epoch(val: datetime) -> int:
+        return int(val.timestamp())
+
+    with moto.mock_s3():
+        # set up the mock S3 environment
+        conn = boto3.client("s3")
+        conn.create_bucket(Bucket=bucket_name_env)
+        yesterday = datetime.now(tz=timezone.utc) - timedelta(days=1)
+        message1 = WhatsAppMessage(
+            "test",
+            "group-id",
+            datetime(year=2023, month=1, day=10, hour=23, minute=23),
+            "Hello",
+            "participant-id",
+            participant_handle="Efi",
+            participant_number="123456",
+            has_media=False,
+        )
+
+        message2 = WhatsAppMessage(
+            "test",
+            "group-id",
+            datetime(year=2023, month=1, day=10, hour=23, minute=24),
+            "Hi",
+            "participant-id",
+            participant_handle="Efi",
+            participant_number="123456",
+            has_media=False,
+        )
+
+        conn.put_object(
+            Bucket=bucket_name_env,
+            Key=f"{yesterday.strftime('%Y.%m.%d')}/random_file1",
+            Body=f"{json.dumps(asdict(message1), default=to_epoch)}\n",
+        )
+
+        conn.put_object(
+            Bucket=bucket_name_env,
+            Key=f"{yesterday.strftime('%Y.%m.%d')}/random_file2",
+            Body=f"{json.dumps(asdict(message2), default=to_epoch)}\n",
+        )
+
+        yield conn
