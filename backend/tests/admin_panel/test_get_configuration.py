@@ -1,3 +1,4 @@
+from backend.src.utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
 from ...src.admin_panel.functions.configuration.app import handler
 from unittest.mock import MagicMock
 import json
@@ -85,3 +86,16 @@ def test_disconnect(basic_auth, secret_manager, events):
         assert json.loads(message["Body"])["detail-type"] == "logout"
 
     assert response["statusCode"] == 200
+
+
+def test_get_groups(basic_auth, group_db, secret_manager):
+    request = http_request(path="/groups", method="GET")
+    WhatsAppGroup(
+        "group-id", name="name", requires_daily_summary=SummaryStatus.MYSELF
+    ).save()
+
+    request["headers"]["Authorization"] = basic_auth
+
+    response = handler(request, MagicMock())
+    assert json.loads(response["body"])["groups"][0]["group_id"] == "group-id"
+    assert json.loads(response["body"])["groups"][0]["summary_status"] == "Myself"

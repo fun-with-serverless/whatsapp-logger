@@ -46,7 +46,7 @@ exclude_dirs = ["tests"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-
+# --cov=backend.src --cov-report xml:coverage.xml  --cov-report term
 [tool.poetry.group.layer.dependencies]
 boto3 = "^1.26.59"
 dacite = "^1.8.0"

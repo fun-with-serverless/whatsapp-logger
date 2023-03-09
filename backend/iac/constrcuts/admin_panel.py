@@ -30,6 +30,7 @@ class AdminPanel(Construct):
         application_state_table: dynamodb.Table,
         layer: lambda_python.PythonLayerVersion,
         openai_key: secretmanager.Secret,
+        whatsapp_group_table: dynamodb.Table,
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
@@ -49,6 +50,7 @@ class AdminPanel(Construct):
                 "GOOGLE_SHEET_URL": sheet_url_parameter.parameter_name,
                 "EVENT_BUS_ARN": event_bus.event_bus_arn,
                 "APPLICATION_STATE_TABLE_NAME": application_state_table.table_name,
+                "WHATSAPP_GROUP_TABLE_NAME": whatsapp_group_table.table_name,
             },
             layers=[layer],
         )
@@ -85,6 +87,7 @@ class AdminPanel(Construct):
         event_bus.grant_put_events_to(qr_lambda)
         application_state_table.grant_write_data(agent_status)
         application_state_table.grant_read_data(qr_lambda)
+        whatsapp_group_table.grant_read_data(qr_lambda)
 
         eb.Rule(
             self,

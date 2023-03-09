@@ -1,3 +1,4 @@
+from enum import Enum
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.event_handler import (
@@ -7,6 +8,9 @@ from aws_lambda_powertools.event_handler import (
 )
 
 from dacite import from_dict
+
+
+from ....utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
 
 from ....utils.authentication import basic_authenticate
 from ....utils.db_models.application_state import ApplicationState, ClientStatus
@@ -18,9 +22,6 @@ import os
 import functools
 import json
 from dataclasses import dataclass, asdict
-
-logger = Logger()
-app = LambdaFunctionUrlResolver(CORSConfig(allow_origin="*"))
 
 
 @dataclass(frozen=True)
@@ -35,6 +36,27 @@ class Status:
     device_status: str
     last_message_arrived: int
     total_today: int
+
+
+@dataclass(frozen=True)
+class AdminPanelWhatsAppGroup:
+    group_id: str
+    name: str
+    mute: bool
+    summary_status: SummaryStatus
+
+
+def enum_serializer(obj) -> str:
+    def enum_to_str(val) -> str:
+        return val.value
+
+    return json.dumps(obj, default=enum_to_str)
+
+
+logger = Logger()
+app = LambdaFunctionUrlResolver(
+    CORSConfig(allow_origin="*"), serializer=enum_serializer, debug=True
+)
 
 
 @app.get("/device-status")
@@ -73,6 +95,31 @@ def get_configuratio():
             openai_key=parameters.get_secret(os.environ["OPENAI_KEY"]),
         )
     )
+
+
+@app.get("/groups")
+@basic_authenticate(app)
+def get_groups():
+    results = WhatsAppGroup.scan()
+    return_value = [
+        asdict(
+            AdminPanelWhatsAppGroup(
+                group_id=result.id,
+                name=result.name,
+                mute=result.always_mark_read,
+                summary_status=result.requires_daily_summary,
+            )
+        )
+        for result in results
+    ]
+
+    return {"groups": return_value}
+
+
+@app.put("/groups/<group_id>")
+@basic_authenticate(app)
+def update_group(group_id: str):
+    pass
 
 
 @app.post("/configuration")

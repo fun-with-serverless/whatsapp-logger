@@ -5,6 +5,8 @@ from .constrcuts.admin_panel import AdminPanel
 from .constrcuts.googlesheets_recorder import GoogleSheetsRecorder
 from .constrcuts.dashboard import Dashboard
 from .constrcuts.message_statistics import MessageStatistics
+from .constrcuts.collect_whatsapp_groups import CollectWhatsAppGroups
+
 from .utils.cdk_utils import prepare_layer
 
 from constructs import Construct
@@ -64,6 +66,7 @@ class Backend(Stack):
             self._state.state_table,
             layer=layer,
             openai_key=configuration.openai_key_secret,
+            whatsapp_group_table=self._state.whatsapp_groups_table,
         )
         self._recorder = GoogleSheetsRecorder(
             self,
@@ -92,6 +95,14 @@ class Backend(Stack):
             whatsapp_messages=self.whatsapp_message_sns,
             chatgpt_key=configuration.openai_key_secret,
             event_bus=self.event_bus,
+        )
+
+        CollectWhatsAppGroups(
+            self,
+            "CollectWhatsAppGroups",
+            self._state.whatsapp_groups_table,
+            layer=layer,
+            chats_bucket=self._state.chats_lake,
         )
 
         CfnOutput(
