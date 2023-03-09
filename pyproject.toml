@@ -16,7 +16,8 @@ destroy = {shell = "cd static_web/iac && cdk destroy --all --force && cd ../.. &
 client_gate = {shell = "cd whatsapp_web_listener && npm run gate && cd .."}
 cdk_synth = {shell = "cdk synth --all && cd static_web/iac && cdk synth --all && cd ../.."}
 gate = ["black", "lint", "pytest", "mypy", "client_gate"]
-gate_ci = ["black_ci", "lint_ci", "pytest", "mypy", "client_gate", "cdk_synth"]
+bandit = "bandit -r backend/src"
+gate_ci = ["black_ci", "lint_ci", "pytest", "mypy", "client_gate", "bandit", "cdk_synth"]
 
 [tool.ruff]
 # Never enforce `E501` (line length violations).
@@ -39,6 +40,9 @@ exclude = [
 
 [tool.pytest.ini_options]
 addopts = "--ignore=cdk.out --cov=backend.src --cov-report xml:coverage.xml  --cov-report term"
+
+[tool.bandit]
+exclude_dirs = ["tests"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -68,6 +72,7 @@ coverage = "^7.2.0"
 pytest-cov = "^4.0.0"
 aws-cdk-aws-kinesisfirehose-alpha = "^2.66.1a0"
 aws-cdk-aws-kinesisfirehose-destinations-alpha = "^2.66.1a0"
+bandit = "^1.7.4"
 
 [build-system]
 requires = ["poetry-core"]
