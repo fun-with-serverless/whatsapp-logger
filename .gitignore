@@ -115,3 +115,6 @@ __pycache__/
 .build
 cdk.context.json
 cdk.out/
+
+# Visual Studio Code
+launch.json

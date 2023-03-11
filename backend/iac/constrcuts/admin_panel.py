@@ -88,6 +88,7 @@ class AdminPanel(Construct):
         application_state_table.grant_write_data(agent_status)
         application_state_table.grant_read_data(qr_lambda)
         whatsapp_group_table.grant_read_data(qr_lambda)
+        whatsapp_group_table.grant_write_data(qr_lambda)
 
         eb.Rule(
             self,

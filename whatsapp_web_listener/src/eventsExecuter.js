@@ -15,9 +15,18 @@ class WhatsAppEventHandler {
         case 'summary': {
           const message = event.detail.content
           const groupName = event.detail.group_name
-          await this.whatsAppClient.sendMeMessage(
-            `🏁 ${groupName} summary:\n${message}`
-          )
+          if (event.detail.send_to === 'Myself') {
+            await this.whatsAppClient.sendMeMessage(
+              `🏁 ${groupName} summary:\n${message}`
+            )
+          } else if (event.detail.send_to === 'Original_Group') {
+            await this.whatsAppClient.sendGroupMessage(
+              `🏁 ${groupName} summary:\n${message}`,
+              event.detail.group_id
+            )
+          } else {
+            pino.error(`Invalid send_to option - ${event.detail.send_to}`)
+          }
           break
         }
         default:

@@ -44,6 +44,7 @@ const pollQueue = async (queueUrl, sqsClient, eventsExecuter) => {
       receiveMessageResponse.Messages.forEach(async (message) => {
         pino.info(`Received message: ${message.Body}`)
         const body = JSON.parse(message.Body)
+        pino.info(body)
         eventsExecuter.handle(body)
         await sqsClient
           .deleteMessage({
@@ -58,7 +59,7 @@ const pollQueue = async (queueUrl, sqsClient, eventsExecuter) => {
   }
   const intervalId = setTimeout(async () => {
     await pollQueue(queueUrl, sqsClient, eventsExecuter)
-  }, 2000)
+  }, 60000)
   return intervalId
 }
 

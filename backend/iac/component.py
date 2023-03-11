@@ -95,6 +95,7 @@ class Backend(Stack):
             whatsapp_messages=self.whatsapp_message_sns,
             chatgpt_key=configuration.openai_key_secret,
             event_bus=self.event_bus,
+            groups_db=self._state.whatsapp_groups_table,
         )
 
         CollectWhatsAppGroups(

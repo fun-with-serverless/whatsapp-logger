@@ -40,7 +40,9 @@ exclude = [
 
 [tool.pytest.ini_options]
 addopts = "--ignore=cdk.out --cov=backend.src --cov-report xml:coverage.xml  --cov-report term"
-
+markers = [
+    "data_date",
+]
 [tool.bandit]
 exclude_dirs = ["tests"]
 

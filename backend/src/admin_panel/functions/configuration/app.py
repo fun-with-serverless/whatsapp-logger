@@ -8,6 +8,8 @@ from aws_lambda_powertools.event_handler import (
 
 from dacite import from_dict
 
+from ....utils.client import Client, DetailType, Source
+
 
 from ....utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
 
@@ -118,7 +120,20 @@ def get_groups():
 @app.put("/groups/<group_id>")
 @basic_authenticate(app)
 def update_group(group_id: str):
-    pass
+    if app.current_event.body is None:
+        return Response(502)
+    try:
+        group = WhatsAppGroup.get(group_id)
+        update_details = json.loads(app.current_event.body)
+        group.update(
+            actions=[
+                WhatsAppGroup.requires_daily_summary.set(
+                    SummaryStatus.from_str(update_details["summary_status"])
+                )
+            ]
+        )
+    except WhatsAppGroup.DoesNotExist:
+        return Response(404)
 
 
 @app.post("/configuration")
@@ -145,17 +160,8 @@ def set_configuratio():
 @app.post("/disconnect")
 @basic_authenticate(app)
 def disconnect():
-    events = _get_events()
-    events.put_events(
-        Entries=[
-            {
-                "EventBusName": os.environ["EVENT_BUS_ARN"],
-                "Detail": str({}),
-                "DetailType": "logout",
-                "Source": "admin",
-            }
-        ]
-    )
+    client = Client()
+    client.send_message(detail_type=DetailType.LOGOUT, source=Source.ADMIN, detail={})
     return Response(status_code=200)
 
 
@@ -177,11 +183,6 @@ def _get_secret_manager():
 @functools.cache
 def _get_ssm():
     return boto3.client("ssm")
-
-
-@functools.cache
-def _get_events():
-    return boto3.client("events")
 
 
 def _get_qr_image() -> bytes:

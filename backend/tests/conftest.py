@@ -115,7 +115,10 @@ def events(monkeypatch):
             events_client.put_rule(
                 Name="MyNewRule",
                 EventPattern=json.dumps(
-                    {"source": ["admin"], "detail-type": ["logout"]}
+                    {
+                        "source": ["admin", "chatgpt"],
+                        "detail-type": ["logout", "summary"],
+                    }
                 ),
                 State="ENABLED",
                 EventBusName="EventBus",
@@ -153,7 +156,7 @@ def s3_chats(bucket_name_env):
 
 
 @pytest.fixture
-def s3_raw_lake(bucket_name_env):
+def s3_raw_lake(bucket_name_env, request):
     def to_epoch(val: datetime) -> int:
         return int(val.timestamp())
 
@@ -161,7 +164,11 @@ def s3_raw_lake(bucket_name_env):
         # set up the mock S3 environment
         conn = boto3.client("s3")
         conn.create_bucket(Bucket=bucket_name_env)
-        yesterday = datetime.now(tz=timezone.utc) - timedelta(days=1)
+        data_date = request.node.get_closest_marker("data_date")
+        date = datetime.now(tz=timezone.utc) - timedelta(days=1)
+        if data_date is not None:
+            date = data_date.args[0]
+
         message1 = WhatsAppMessage(
             "test",
             "group-id",
@@ -186,13 +193,13 @@ def s3_raw_lake(bucket_name_env):
 
         conn.put_object(
             Bucket=bucket_name_env,
-            Key=f"{yesterday.strftime('%Y.%m.%d')}/random_file1",
+            Key=f"{date.strftime('%Y.%m.%d')}/random_file1",
             Body=f"{json.dumps(asdict(message1), default=to_epoch)}\n",
         )
 
         conn.put_object(
             Bucket=bucket_name_env,
-            Key=f"{yesterday.strftime('%Y.%m.%d')}/random_file2",
+            Key=f"{date.strftime('%Y.%m.%d')}/random_file2",
             Body=f"{json.dumps(asdict(message2), default=to_epoch)}\n",
         )
 
