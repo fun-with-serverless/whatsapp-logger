@@ -9,11 +9,11 @@
 <h3 align="center">WhatsApp Group Manager</h3>
 
   <p align="center">
-   Introducing a new application that helps you keep track of your WhatsApp group discussions. If you have several WhatsApp groups, you may sometimes find it challenging to keep up with the conversations and discussions, especially if you are a new member. This application solves this problem by saving the content of your WhatsApp groups in a Google Sheet.
+   Introducing a new application that helps you keep track of your WhatsApp group discussions. If you have several WhatsApp groups, you may sometimes find it challenging to keep up with the conversations and discussions, especially if you are a new member. This application solves this problem by saving the content of your WhatsApp groups in a Google Sheet and to create a daily summary of the conversations using ChatGPT.
 
 With this application, new members can easily review previous discussions, even if they weren't a part of the group when the discussions took place. The Google Sheet acts as a database of all the discussions, allowing new members to search for relevant information using keywords or specific dates.
 
-In the future, we plan to add daily summaries of the discussions, providing a quick and easy way to stay up-to-date on the latest happenings in your WhatsApp groups. Additionally, we will provide access to any media shared in the group, such as images, videos, and audio clips. With these features, you will have all the information you need at your fingertips, making it easier than ever to stay connected with your WhatsApp groups.
+In the future, we will provide access to any media shared in the group, such as images, videos, and audio clips. With these features, you will have all the information you need at your fingertips, making it easier than ever to stay connected with your WhatsApp groups.
     </p>
 <img src="https://user-images.githubusercontent.com/110536677/217352491-ad533419-45db-4c30-ba28-ed3a843e7fa3.png">
     <br />
