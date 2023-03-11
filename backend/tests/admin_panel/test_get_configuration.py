@@ -1,3 +1,4 @@
+from backend.src.utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
 from ...src.admin_panel.functions.configuration.app import handler
 from unittest.mock import MagicMock
 import json
@@ -6,7 +7,7 @@ import os
 import boto3
 from .utils import http_request
 from ..conftest import OPENAI_KEY, SECRET_GOOGLE_AUTH, MOCK_SHEET_URL
-from backend.src.utils.dynamodb_models import ApplicationState, ClientStatus
+from backend.src.utils.db_models.application_state import ApplicationState, ClientStatus
 
 
 def test_get_configuration(secret_manager, parameters_store, basic_auth):
@@ -54,6 +55,39 @@ def test_post_configuration(secret_manager, parameters_store, basic_auth):
     )
 
 
+def test_post_configuration_saving_only_pat_of_values(
+    secret_manager, parameters_store, basic_auth
+):
+    request = http_request(
+        path="/configuration",
+        method="POST",
+        body=json.dumps(
+            {
+                "google_secret": "",
+                "sheet_url": "",
+                "openai_key": "!Q!W@E#",
+            }
+        ),
+    )
+    request["headers"]["Authorization"] = basic_auth
+
+    response = handler(request, MagicMock())
+
+    assert response["statusCode"] == 200
+
+    assert (
+        parameters.get_secret(os.environ["GOOGLE_SECRET_AUTH_NAME"], force_fetch=True)
+        == "Replace"
+    )
+    assert (
+        parameters.get_parameter(os.environ["GOOGLE_SHEET_URL"], force_fetch=True)
+        == "Replace"
+    )
+    assert (
+        parameters.get_secret(os.environ["OPENAI_KEY"], force_fetch=True) == "!Q!W@E#"
+    )
+
+
 def test_get_device_status(basic_auth, application_state_db, secret_manager):
     request = http_request(path="/device-status", method="GET")
 
@@ -85,3 +119,16 @@ def test_disconnect(basic_auth, secret_manager, events):
         assert json.loads(message["Body"])["detail-type"] == "logout"
 
     assert response["statusCode"] == 200
+
+
+def test_get_groups(basic_auth, group_db, secret_manager):
+    request = http_request(path="/groups", method="GET")
+    WhatsAppGroup(
+        "group-id", name="name", requires_daily_summary=SummaryStatus.MYSELF
+    ).save()
+
+    request["headers"]["Authorization"] = basic_auth
+
+    response = handler(request, MagicMock())
+    assert json.loads(response["body"])["groups"][0]["group_id"] == "group-id"
+    assert json.loads(response["body"])["groups"][0]["summary_status"] == "Myself"

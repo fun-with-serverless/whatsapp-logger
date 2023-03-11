@@ -89,11 +89,15 @@ def _get_get_google_sheet_object() -> gspread.spreadsheet.Spreadsheet:
 
 @logger.inject_lambda_context
 def handler(event: dict, context: LambdaContext):
-
+    try:
+        google_sheets = _get_get_google_sheet_object()
+    except Exception as err:
+        logger.info(f"Failed initializing google_sheets. Skipping message. {err}")
+        return
     batch = event["Records"]
     with processor(
         records=batch,
-        handler=lambda record: record_handler(record, _get_get_google_sheet_object()),
+        handler=lambda record: record_handler(record, google_sheets),
     ):
         processor.process()
 

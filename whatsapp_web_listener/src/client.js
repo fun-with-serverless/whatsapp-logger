@@ -51,6 +51,11 @@ class WhatsAppClient {
     pino.info('Message successfuly sent to self')
   }
 
+  async sendGroupMessage (message, groupId) {
+    await this.client.sendMessage(`${groupId}@g.us`, message)
+    pino.info('Message successfuly sent to group')
+  }
+
   async onQr (qr) {
     pino.info('QR code generated.')
     await sendStatusUpdate({

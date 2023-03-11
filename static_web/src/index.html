@@ -38,17 +38,22 @@
         <li class="nav-item">
           <a class="nav-link" href="#statistics" data-toggle="tab">Message Statistics</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#groups-configuration" data-toggle="tab">Groups Configuration</a>
+        </li>
       </ul>
       <div class="tab-content py-4">
         <div id="app-config" class="tab-pane active">
           <form>
             <div class="form-group">
               <label for="google_secret">Google Secret:</label>
-              <textarea id="google_secret" placeholder="{&#10;&#9;&#63;type&#63;: &#63;service_account&#63;" name="google_secret" class="form-control" style="height: 10em"></textarea>
+              <textarea id="google_secret" placeholder="{&#10;&#9;&#63;type&#63;: &#63;service_account&#63;"
+                name="google_secret" class="form-control" style="height: 10em"></textarea>
             </div>
             <div class="form-group">
               <label for="sheet_url">Sheet URL:</label>
-              <input type="text" id="sheet_url" name="sheet_url" class="form-control" placeholder="https://docs.google.com/spreadsheets/d..." >
+              <input type="text" id="sheet_url" name="sheet_url" class="form-control"
+                placeholder="https://docs.google.com/spreadsheets/d...">
             </div>
             <div class="form-group">
               <label for="openai_key">OpenAI Key:</label>
@@ -85,6 +90,9 @@
               </div>
             </div>
           </div>
+        </div>
+        <div id="groups-configuration" class="tab-pane">
+          <div id="groups-table"></div>
         </div>
       </div>
     </div>

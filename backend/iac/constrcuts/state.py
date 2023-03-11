@@ -11,6 +11,10 @@ class State(Construct):
         return self._application_state_table
 
     @property
+    def whatsapp_groups_table(self) -> dynamodb.Table:
+        return self._whatsapp_groups_table
+
+    @property
     def qr_bucket(self) -> s3.Bucket:
         return self._bucket
 
@@ -31,6 +35,15 @@ class State(Construct):
             "ApplicationState",
             partition_key=dynamodb.Attribute(
                 name="key", type=dynamodb.AttributeType.STRING
+            ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+        )
+
+        self._whatsapp_groups_table = dynamodb.Table(
+            self,
+            "WhatsAppGroups",
+            partition_key=dynamodb.Attribute(
+                name="id", type=dynamodb.AttributeType.STRING
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )

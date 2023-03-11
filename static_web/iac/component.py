@@ -29,15 +29,21 @@ class StaticWeb(Stack):
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        domain = get_cf_output("BackendURL")
+        domain = get_cf_output(f"BackendURL-{os.environ.get('USER', 'NoUser')}")
 
         destination_bucket = s3.Bucket.from_bucket_arn(
-            self, "DestinationBucket", bucket_arn=Fn.import_value("WebBucketArn")
+            self,
+            "DestinationBucket",
+            bucket_arn=Fn.import_value(
+                f"WebBucketArn-{os.environ.get('USER', 'NoUser')}"
+            ),
         )
         distribution = cloudfront.Distribution.from_distribution_attributes(
             self,
             "Distribution",
-            distribution_id=Fn.import_value("DashboardDistributionId"),
+            distribution_id=Fn.import_value(
+                f"DashboardDistributionId-{os.environ.get('USER', 'NoUser')}"
+            ),
             domain_name=urlparse(domain).netloc,
         )
 

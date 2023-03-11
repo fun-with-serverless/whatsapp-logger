@@ -1,3 +1,40 @@
+class Table {
+    constructor(selector, columns) {
+        this.selector = selector;
+        this.columns = columns;
+        this.$tableElement = $("<table>").addClass("table");
+        $(this.selector).append(this.$tableElement);
+        const $head = $("<thead>")
+        const $tr = $("<tr>");
+        this.columns.forEach((column) => {
+            const th = $("<th>").attr("scope", "col").text(column);
+            $tr.append(th);
+        });
+        $head.append($tr)
+        this.$tableElement.append($head);
+        this.$body = $("<tbody>")
+        this.$tableElement.append(this.$body)
+    }
+
+
+    addRow(rowId, row) {
+        const $tr = $("<tr>").attr("data-row-id", rowId);
+        row.forEach((column) => {
+            const $td = $("<td>")
+            if (!column.isHtml) {
+                $td.text(column.value);
+            } else {
+                $td.append(column.value)
+            }
+
+            $tr.append($td);
+        });
+        this.$body.append($tr);
+    }
+}
+
+
+const options = [{ value: "None", label: "None" }, { value: "Myself", label: "Myself" }, { value: "Original_Group", label: "Original Group" }];
 const endPointURL = "$URL$"
 var spinner = new Spinner({
     color: '#3d3d3d',
@@ -67,8 +104,9 @@ async function submitForm() {
         if (response.openai_key !== "Replace") {
             $("#openai_key").val(response.openai_key);
         }
-        
+
         pullStatus();
+        await pullGroups();
     } catch (error) {
         console.log(error.message)
         alert("Authentication failed. Please check your username and password.");
@@ -113,8 +151,41 @@ async function showQR() {
         alert("Error in loading the QR code. Please check your username and password.");
     }
 }
+
+async function pullGroups() {
+    try {
+        var response = await getRequest({
+            verb: "GET",
+            url: endPointURL + "groups"
+        });
+        const table = new Table("#groups-table", ["Group Name", "Summary Configuration"])
+        response.groups.forEach(item => {
+            const $dropdown = $('<select>').addClass('form-control');
+            options.forEach((option) => {
+                $dropdown.append($('<option>').val(option.value).text(option.label));
+            });
+
+            $dropdown.val(item.summary_status)
+
+            $dropdown.on('change', function () {
+                const selectedValue = $(this).val();
+                getRequest({
+                    verb: "PUT",
+                    url: endPointURL + `groups/${item.group_id}`,
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ summary_status: selectedValue })
+                })
+            });
+            table.addRow(item.group_id, [{ value: item.name, isHtml: false }, { value: $dropdown, isHtml: true }])
+        });
+
+    } catch (error) {
+        console.log(error.message)
+    }
+}
 async function pullStatus() {
-    showLoading();
     try {
         const response = await getRequest({
             verb: "GET",
@@ -134,7 +205,6 @@ async function pullStatus() {
     } catch (error) {
         console.log(error.message)
     }
-    hideLoading();
     setTimeout(pullStatus, 5000);
 }
 async function disconnect() {

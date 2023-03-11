@@ -13,6 +13,7 @@ from aws_cdk import (
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as sfn_tasks,
     aws_logs as logs,
+    aws_dynamodb as dynamodb,
 )
 
 from .sns_sqs import SnsSqsConnection
@@ -28,6 +29,7 @@ class ChatGPTIntegration(Construct):
         whatsapp_messages: sns.Topic,
         chatgpt_key: secretmanager.Secret,
         event_bus: events.EventBus,
+        groups_db: dynamodb.Table,
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
@@ -94,8 +96,22 @@ class ChatGPTIntegration(Construct):
             },
         )
 
+        send_to_client = lambda_python.PythonFunction(
+            self,
+            "SendSummaryToClient",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            entry="backend",
+            index="src/chatgpt_integration/functions/send_summary_to_client/app.py",
+            timeout=Duration.seconds(30),
+            layers=[layer],
+            environment={
+                "EVENT_BUS_ARN": event_bus.event_bus_arn,
+                "WHATSAPP_GROUP_TABLE_NAME": groups_db.table_name,
+            },
+        )
+
         state_machine = self._build_stf(
-            summerize_chats, chatgpt_call, delete_buckup, event_bus
+            summerize_chats, chatgpt_call, delete_buckup, send_to_client
         )
 
         schedule_expression = events.Schedule.expression(
@@ -123,6 +139,8 @@ class ChatGPTIntegration(Construct):
         chats_bucket.grant_read(delete_buckup)
         chats_bucket.grant_read(summerize_chats)
         chats_bucket.grant_read(chatgpt_call)
+        event_bus.grant_put_events_to(send_to_client)
+        groups_db.grant_read_data(send_to_client)
 
         SnsSqsConnection(self, "WriteToS3", whatsapp_messages, write_chats_to_s3)
 
@@ -131,7 +149,7 @@ class ChatGPTIntegration(Construct):
         summerize_chats: lambda_python.PythonFunction,
         chatgpt_call: lambda_python.PythonFunction,
         delete_buckup: lambda_python.PythonFunction,
-        event_bus: events.EventBus,
+        send_to_client: lambda_python.PythonFunction,
     ) -> sfn.StateMachine:
         summerize_step = sfn_tasks.LambdaInvoke(
             self,
@@ -143,6 +161,7 @@ class ChatGPTIntegration(Construct):
             self,
             "Send to ChatGPT",
             lambda_function=chatgpt_call,
+            output_path="$.Payload",
         )
 
         delete_and_backup_step = sfn_tasks.LambdaInvoke(
@@ -151,17 +170,10 @@ class ChatGPTIntegration(Construct):
             lambda_function=delete_buckup,
         )
 
-        send_to_eventbridge = sfn_tasks.EventBridgePutEvents(
+        send_to_client_step = sfn_tasks.LambdaInvoke(
             self,
-            "Send an event to EventBridge",
-            entries=[
-                sfn_tasks.EventBridgePutEventsEntry(
-                    detail=sfn.TaskInput.from_json_path_at("$.Payload"),
-                    source="chatgpt",
-                    detail_type="summary",
-                    event_bus=event_bus,
-                )
-            ],
+            "Send summary to client",
+            lambda_function=send_to_client,
         )
 
         map = sfn.Map(
@@ -170,7 +182,7 @@ class ChatGPTIntegration(Construct):
 
         success = sfn.Succeed(self, "All summery messages were sent")
 
-        map.iterator(send_to_chatgpt.next(send_to_eventbridge))
+        map.iterator(send_to_chatgpt.next(send_to_client_step))
 
         definition = summerize_step.next(map).next(delete_and_backup_step).next(success)
         return sfn.StateMachine(

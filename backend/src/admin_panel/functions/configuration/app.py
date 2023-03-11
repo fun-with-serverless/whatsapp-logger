@@ -8,8 +8,13 @@ from aws_lambda_powertools.event_handler import (
 
 from dacite import from_dict
 
+from ....utils.client import Client, DetailType, Source
+
+
+from ....utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
+
 from ....utils.authentication import basic_authenticate
-from ....utils.dynamodb_models import ApplicationState, ClientStatus
+from ....utils.db_models.application_state import ApplicationState, ClientStatus
 from aws_lambda_powertools.utilities import parameters
 import boto3
 
@@ -18,9 +23,6 @@ import os
 import functools
 import json
 from dataclasses import dataclass, asdict
-
-logger = Logger()
-app = LambdaFunctionUrlResolver(CORSConfig(allow_origin="*"))
 
 
 @dataclass(frozen=True)
@@ -35,6 +37,28 @@ class Status:
     device_status: str
     last_message_arrived: int
     total_today: int
+
+
+@dataclass(frozen=True)
+class AdminPanelWhatsAppGroup:
+    group_id: str
+    name: str
+    mute: bool
+    summary_status: SummaryStatus
+
+
+def enum_serializer(obj) -> str:
+    def enum_to_str(val) -> str:
+        return val.value
+
+    return json.dumps(obj, default=enum_to_str)
+
+
+logger = Logger()
+app = LambdaFunctionUrlResolver(
+    CORSConfig(allow_origin="*"),
+    serializer=enum_serializer,
+)
 
 
 @app.get("/device-status")
@@ -75,21 +99,61 @@ def get_configuratio():
     )
 
 
+@app.get("/groups")
+@basic_authenticate(app)
+def get_groups():
+    results = WhatsAppGroup.scan()
+    return_value = [
+        asdict(
+            AdminPanelWhatsAppGroup(
+                group_id=result.id,
+                name=result.name,
+                mute=result.always_mark_read,
+                summary_status=result.requires_daily_summary,
+            )
+        )
+        for result in results
+    ]
+
+    return {"groups": return_value}
+
+
+@app.put("/groups/<group_id>")
+@basic_authenticate(app)
+def update_group(group_id: str):
+    if app.current_event.body is None:
+        return Response(502)
+    try:
+        group = WhatsAppGroup.get(group_id)
+        update_details = json.loads(app.current_event.body)
+        group.update(
+            actions=[
+                WhatsAppGroup.requires_daily_summary.set(
+                    SummaryStatus.from_str(update_details["summary_status"])
+                )
+            ]
+        )
+    except WhatsAppGroup.DoesNotExist:
+        return Response(404)
+
+
 @app.post("/configuration")
 @basic_authenticate(app)
 def set_configuratio():
     conf = from_dict(data_class=Configuration, data=json.loads(app.current_event.body))
     secret = _get_secret_manager()
     secret.update_secret(
-        SecretId=os.environ["GOOGLE_SECRET_AUTH_NAME"], SecretString=conf.google_secret
+        SecretId=os.environ["GOOGLE_SECRET_AUTH_NAME"],
+        SecretString=conf.google_secret if conf.google_secret else "Replace",
     )
     secret.update_secret(
-        SecretId=os.environ["OPENAI_KEY"], SecretString=conf.openai_key
+        SecretId=os.environ["OPENAI_KEY"],
+        SecretString=conf.openai_key if conf.openai_key else "Replace",
     )
     ssm = _get_ssm()
     ssm.put_parameter(
         Name=os.environ["GOOGLE_SHEET_URL"],
-        Value=conf.sheet_url,
+        Value=conf.sheet_url if conf.sheet_url else "Replace",
         Type="String",
         Overwrite=True,
     )
@@ -99,17 +163,8 @@ def set_configuratio():
 @app.post("/disconnect")
 @basic_authenticate(app)
 def disconnect():
-    events = _get_events()
-    events.put_events(
-        Entries=[
-            {
-                "EventBusName": os.environ["EVENT_BUS_ARN"],
-                "Detail": str({}),
-                "DetailType": "logout",
-                "Source": "admin",
-            }
-        ]
-    )
+    client = Client()
+    client.send_message(detail_type=DetailType.LOGOUT, source=Source.ADMIN, detail={})
     return Response(status_code=200)
 
 
@@ -131,11 +186,6 @@ def _get_secret_manager():
 @functools.cache
 def _get_ssm():
     return boto3.client("ssm")
-
-
-@functools.cache
-def _get_events():
-    return boto3.client("events")
 
 
 def _get_qr_image() -> bytes:

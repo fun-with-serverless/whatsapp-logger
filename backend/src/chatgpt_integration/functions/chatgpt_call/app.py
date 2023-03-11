@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import asdict
 import functools
 import json
 import os
@@ -8,6 +9,8 @@ import openai
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities import parameters
+
+from ...utils.models import ChatGPTSummary
 
 if TYPE_CHECKING:
     from mypy_boto3_s3.service_resource import S3ServiceResource
@@ -45,11 +48,13 @@ def handler(event, context: LambdaContext):
         gpt_reponse=response["choices"][0]["message"]["content"],
         gorup_name=summary["group_name"],
     )
-    return {
-        "content": response["choices"][0]["message"]["content"],
-        "group_name": summary["group_name"],
-        "group_id": summary["group_id"],
-    }
+    return asdict(
+        ChatGPTSummary(
+            content=response["choices"][0]["message"]["content"],
+            group_name=summary["group_name"],
+            group_id=summary["group_id"],
+        )
+    )
 
 
 @functools.cache

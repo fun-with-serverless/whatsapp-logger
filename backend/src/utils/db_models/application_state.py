@@ -10,6 +10,8 @@ from pynamodb.attributes import (
 import os
 from enum import Enum
 
+from ...utils.general import enum_from_str
+
 DEFAULT_APPLICATION_STATE_DB_NAME = "APPLICATION_STATE_DB_REPLACE"
 LAST_MESSAGE_ARRIVED_KEY = "last_message_arrived"
 
@@ -26,10 +28,7 @@ class ClientStatus(Enum):
 
     @classmethod
     def from_str(cls, value: str) -> "ClientStatus":
-        try:
-            return cls[value.upper()]
-        except KeyError:
-            raise ValueError(f"{value} is not a valid member of {cls.__name__}")
+        return enum_from_str(ClientStatus, value)
 
 
 class ApplicationState(Model):

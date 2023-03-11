@@ -1,3 +1,5 @@
+from dataclasses import asdict
+from datetime import datetime, timedelta, timezone
 import moto  # type: ignore
 import boto3
 import pytest
@@ -5,8 +7,9 @@ import base64
 import os
 import json
 from backend.src.chatgpt_integration.utils.consts import SUMMARY_PREFIX
-from backend.src.utils.dynamodb_models import ApplicationState
-
+from backend.src.utils.db_models.application_state import ApplicationState
+from backend.src.utils.db_models.whatsapp_groups import WhatsAppGroup
+from backend.src.utils.models import WhatsAppMessage
 
 SECRET_STRING = "password"
 SECRET_GOOGLE_AUTH = "google auth"
@@ -75,6 +78,13 @@ def application_state_db(monkeypatch):
 
 
 @pytest.fixture
+def group_db(monkeypatch):
+    with moto.mock_dynamodb():
+        WhatsAppGroup.create_table(wait=True)
+        yield
+
+
+@pytest.fixture
 def basic_auth() -> str:
     basic_auth = base64.b64encode(f"{USER}:{SECRET_STRING}".encode()).decode()
     return f"Basic {basic_auth}"
@@ -105,7 +115,10 @@ def events(monkeypatch):
             events_client.put_rule(
                 Name="MyNewRule",
                 EventPattern=json.dumps(
-                    {"source": ["admin"], "detail-type": ["logout"]}
+                    {
+                        "source": ["admin", "chatgpt"],
+                        "detail-type": ["logout", "summary"],
+                    }
                 ),
                 State="ENABLED",
                 EventBusName="EventBus",
@@ -140,3 +153,54 @@ def s3_chats(bucket_name_env):
         )
 
         yield conn, file_name
+
+
+@pytest.fixture
+def s3_raw_lake(bucket_name_env, request):
+    def to_epoch(val: datetime) -> int:
+        return int(val.timestamp())
+
+    with moto.mock_s3():
+        # set up the mock S3 environment
+        conn = boto3.client("s3")
+        conn.create_bucket(Bucket=bucket_name_env)
+        data_date = request.node.get_closest_marker("data_date")
+        date = datetime.now(tz=timezone.utc) - timedelta(days=1)
+        if data_date is not None:
+            date = data_date.args[0]
+
+        message1 = WhatsAppMessage(
+            "test",
+            "group-id",
+            datetime(year=2023, month=1, day=10, hour=23, minute=23),
+            "Hello",
+            "participant-id",
+            participant_handle="Efi",
+            participant_number="123456",
+            has_media=False,
+        )
+
+        message2 = WhatsAppMessage(
+            "test",
+            "group-id",
+            datetime(year=2023, month=1, day=10, hour=23, minute=24),
+            "Hi",
+            "participant-id",
+            participant_handle="Efi",
+            participant_number="123456",
+            has_media=False,
+        )
+
+        conn.put_object(
+            Bucket=bucket_name_env,
+            Key=f"{date.strftime('%Y.%m.%d')}/random_file1",
+            Body=f"{json.dumps(asdict(message1), default=to_epoch)}\n",
+        )
+
+        conn.put_object(
+            Bucket=bucket_name_env,
+            Key=f"{date.strftime('%Y.%m.%d')}/random_file2",
+            Body=f"{json.dumps(asdict(message2), default=to_epoch)}\n",
+        )
+
+        yield conn
