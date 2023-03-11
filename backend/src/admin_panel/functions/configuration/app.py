@@ -56,7 +56,8 @@ def enum_serializer(obj) -> str:
 
 logger = Logger()
 app = LambdaFunctionUrlResolver(
-    CORSConfig(allow_origin="*"), serializer=enum_serializer, debug=True
+    CORSConfig(allow_origin="*"),
+    serializer=enum_serializer,
 )
 
 
@@ -142,15 +143,17 @@ def set_configuratio():
     conf = from_dict(data_class=Configuration, data=json.loads(app.current_event.body))
     secret = _get_secret_manager()
     secret.update_secret(
-        SecretId=os.environ["GOOGLE_SECRET_AUTH_NAME"], SecretString=conf.google_secret
+        SecretId=os.environ["GOOGLE_SECRET_AUTH_NAME"],
+        SecretString=conf.google_secret if conf.google_secret else "Replace",
     )
     secret.update_secret(
-        SecretId=os.environ["OPENAI_KEY"], SecretString=conf.openai_key
+        SecretId=os.environ["OPENAI_KEY"],
+        SecretString=conf.openai_key if conf.openai_key else "Replace",
     )
     ssm = _get_ssm()
     ssm.put_parameter(
         Name=os.environ["GOOGLE_SHEET_URL"],
-        Value=conf.sheet_url,
+        Value=conf.sheet_url if conf.sheet_url else "Replace",
         Type="String",
         Overwrite=True,
     )

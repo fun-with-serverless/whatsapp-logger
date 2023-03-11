@@ -1,3 +1,4 @@
+import os
 from .constrcuts.chatgpt_integration import ChatGPTIntegration
 from .constrcuts.state import State
 from .constrcuts.configuration import Configuration
@@ -121,6 +122,6 @@ class Backend(Stack):
         CfnOutput(
             self,
             "BackendURL",
-            export_name="BackendURL",
+            export_name=f"BackendURL-{os.environ.get('USER', 'NoUser')}",
             value=admin.lambda_url,
         )

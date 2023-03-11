@@ -1,3 +1,4 @@
+import os
 from constructs import Construct
 from aws_solutions_constructs.aws_cloudfront_s3 import CloudFrontToS3
 from aws_cdk import aws_s3 as s3, CfnOutput
@@ -26,13 +27,13 @@ class Dashboard(Construct):
         CfnOutput(
             self,
             "WebBucketArn",
-            export_name="WebBucketArn",
+            export_name=f"WebBucketArn-{os.environ.get('USER', 'NoUser')}",
             value=cfs3.s3_bucket_interface.bucket_arn,
         )
 
         CfnOutput(
             self,
             "DashboardDistributionId",
-            export_name="DashboardDistributionId",
+            export_name=f"DashboardDistributionId-{os.environ.get('USER', 'NoUser')}",
             value=cfs3.cloud_front_web_distribution.distribution_id,
         )

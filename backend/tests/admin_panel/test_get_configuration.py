@@ -55,6 +55,39 @@ def test_post_configuration(secret_manager, parameters_store, basic_auth):
     )
 
 
+def test_post_configuration_saving_only_pat_of_values(
+    secret_manager, parameters_store, basic_auth
+):
+    request = http_request(
+        path="/configuration",
+        method="POST",
+        body=json.dumps(
+            {
+                "google_secret": "",
+                "sheet_url": "",
+                "openai_key": "!Q!W@E#",
+            }
+        ),
+    )
+    request["headers"]["Authorization"] = basic_auth
+
+    response = handler(request, MagicMock())
+
+    assert response["statusCode"] == 200
+
+    assert (
+        parameters.get_secret(os.environ["GOOGLE_SECRET_AUTH_NAME"], force_fetch=True)
+        == "Replace"
+    )
+    assert (
+        parameters.get_parameter(os.environ["GOOGLE_SHEET_URL"], force_fetch=True)
+        == "Replace"
+    )
+    assert (
+        parameters.get_secret(os.environ["OPENAI_KEY"], force_fetch=True) == "!Q!W@E#"
+    )
+
+
 def test_get_device_status(basic_auth, application_state_db, secret_manager):
     request = http_request(path="/device-status", method="GET")
 

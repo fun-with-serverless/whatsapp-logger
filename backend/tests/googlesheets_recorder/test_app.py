@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
 
 from backend.tests.utils import get_sqs_body
-from ...src.googlesheets_recorder.app import record_handler
+from ...src.googlesheets_recorder.app import handler, record_handler
 
 
 def test_record_handler():
@@ -42,3 +42,9 @@ def test_record_handler_group_is_empty_no_row_is_appended():
 
         record_handler(record, sheet)
         sheet.worksheet.assert_not_called()
+
+
+def test_missing_google_sheet_details_ignore_message():
+    result = handler({}, MagicMock())
+
+    assert result is None
