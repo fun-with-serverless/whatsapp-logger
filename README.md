@@ -49,7 +49,7 @@ In the future, we plan to add daily summaries of the discussions, providing a qu
 ## High level architecture
 
 <div align="center">
-    <img src="https://user-images.githubusercontent.com/110536677/222930399-eab3eb13-5ee7-4426-bb8d-2034b7acf873.png" alt="Architecture diagram">
+    <img src="(https://user-images.githubusercontent.com/110536677/224486399-e0b2c8f9-91b8-47af-acbc-a84bb8077286.png" alt="Architecture diagram">
 </div>
 
 This architecture consists of several AWS components that work together to allow for capturing and storing data from the popular messaging application, WhatsApp. The components in the architecture include:
@@ -90,6 +90,17 @@ This architecture consists of several AWS components that work together to allow
 * Go to the admin dashboard, the user name is `admin`and the password is the one you have copied.
 ![image](https://user-images.githubusercontent.com/110536677/220544849-6a6f21c0-0b4f-44be-b4b2-b21008a41ef0.png)
 
+### Setting up OpenAI
+* You can create daily summary of your various WhatsApp groups.
+* Behind the scene this app is using OpenAI ChatGPT engine to summerize the conversations.
+* You need to setup an OpenAI  dev account.
+* Signup to [OpenAI](https://platform.openai.com/signup)
+* Create a secret key by going to the `manage account` and choose API Keys
+![New Project (1)](https://user-images.githubusercontent.com/110536677/224487016-4950b611-2b92-4980-a797-1c297e914541.png)
+* Copy the key and paste it the OpenAI Key in the admin panel.
+![image](https://user-images.githubusercontent.com/110536677/224487060-77059cd6-0db8-45f3-987b-cbd548b2f83d.png)
+* Every one hour, the list of available groups in your WhatsApp account are collected and shown under Groups Configuration.
+* You can choose per group where do you want the summary to be written at.
 
 ### Setting up Google
 * Create a new spreadsheet in google sheet.
@@ -127,16 +138,18 @@ Here’s how to get one:
 * Now go to the admin dashboard from the previous section.
 * Paste the json into the `Google Secret` text box.
 * Copy the the spreadsheet url you created in step one and paste it into the `Sheet URL` text box.
-![image](https://user-images.githubusercontent.com/110536677/220545115-24cec40b-74cb-4c0f-b712-1760a4ca61a9.png)
+![image](https://user-images.githubusercontent.com/110536677/224486473-d2f71418-2058-4785-808b-8f3464e9ba36.png)
 
 * Click save and you are done.
 
 ### Connecting WhatsApps
-* Behind the scenes this application uses WhatsApp web to pull chat content.
+* Behind the scenes this application uses [WhatsApp web](https://github.com/pedroslopez/whatsapp-web.js/) to pull chat content.
 * In order to connect to WhatsApp you need to scan a QR code with your **Real WhatsApp instance**, that is, the one that runs on a real phone.
-* Please be aware that this process is experimental and may result in your WhatsApp number being identified as a bot and disconnected. It is recommended to use a disposable number instead.
-* In the admin dashboard click on `Show QR code`, and scan the image with your WhatsApp app.
+* **Please be aware** that this process is experimental and may result in your WhatsApp number being identified as a bot and disconnected. It is recommended to use a disposable number instead.
+* In the admin dashboard click on `WebApp Client Status`, and scan the image with your WhatsApp app.
 * You are good to go. See your spreadsheet gets updated.
+
+![image](https://user-images.githubusercontent.com/110536677/224486661-90f4ddd4-94be-4b37-a1c3-561924fb7dc7.png)
 
 ## Contributing
 
