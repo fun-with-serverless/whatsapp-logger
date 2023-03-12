@@ -24,6 +24,11 @@ class WhatsAppEventHandler {
               `🏁 ${groupName} summary:\n${message}`,
               event.detail.group_id
             )
+          } else if (event.detail.send_to === 'Other') {
+            await this.whatsAppClient.sendGroupMessage(
+              `🏁 ${groupName} summary:\n${message}`,
+              event.detail.send_to_group_id
+            )
           } else {
             pino.error(`Invalid send_to option - ${event.detail.send_to}`)
           }

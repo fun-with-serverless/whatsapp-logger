@@ -34,7 +34,11 @@ class Table {
 }
 
 
-const options = [{ value: "None", label: "None" }, { value: "Myself", label: "Myself" }, { value: "Original_Group", label: "Original Group" }];
+const options = [{ value: "None", label: "None" }, 
+{ value: "Myself", label: "Myself" }, 
+{ value: "Original_Group", label: "Original Group" }, 
+{ value: "Other", label: "Other Group" }];
+
 const endPointURL = "$URL$"
 var spinner = new Spinner({
     color: '#3d3d3d',

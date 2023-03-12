@@ -17,6 +17,7 @@ class SummaryStatus(Enum):
     NONE = "None"
     MYSELF = "Myself"
     ORIGINAL_GROUP = "Original_Group"
+    OTHER = "Other"
 
     @classmethod
     def from_str(cls, value: str) -> "SummaryStatus":
@@ -36,3 +37,4 @@ class WhatsAppGroup(Model):
     )
     always_mark_read = BooleanAttribute(default=False)
     created = UTCDateTimeAttribute(default=datetime.now)
+    send_summary_to_group_id = UnicodeAttribute(null=True)
