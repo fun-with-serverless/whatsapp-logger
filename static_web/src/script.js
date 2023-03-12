@@ -34,9 +34,9 @@ class Table {
 }
 
 
-const options = [{ value: "None", label: "None" }, 
-{ value: "Myself", label: "Myself" }, 
-{ value: "Original_Group", label: "Original Group" }, 
+const options = [{ value: "None", label: "None" },
+{ value: "Myself", label: "Myself" },
+{ value: "Original_Group", label: "Original Group" },
 { value: "Other", label: "Other Group" }];
 
 const endPointURL = "$URL$"
@@ -181,6 +181,9 @@ async function pullGroups() {
                     },
                     body: JSON.stringify({ summary_status: selectedValue })
                 })
+                if (selectedValue === "Other") {
+                    alert("Other mode is not fully supported. Choose a different summary mode")
+                }
             });
             table.addRow(item.group_id, [{ value: item.name, isHtml: false }, { value: $dropdown, isHtml: true }])
         });
