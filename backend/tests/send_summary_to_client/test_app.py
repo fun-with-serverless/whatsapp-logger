@@ -22,6 +22,22 @@ def test_group_found_summary_sent(events, group_db):
         assert json.loads(message["Body"])["detail-type"] == DetailType.SUMMARY.value
         assert json.loads(message["Body"])["detail"]["send_to"] == "Myself"
         assert json.loads(message["Body"])["detail"]["group_id"] == "group-id"
+        assert json.loads(message["Body"])["detail"]["send_to_group_id"] is None
+
+
+def test_group_is_marked_to_send_to_others(events, group_db):
+    WhatsAppGroup(
+        "group-id",
+        name="group-name",
+        requires_daily_summary=SummaryStatus.OTHER,
+        send_summary_to_group_id="group-id2",
+    ).save()
+    handler(asdict(ChatGPTSummary("Send", "group-name", "group-id")), MagicMock())
+
+    sqs_client = boto3.client("sqs")
+    sqs_response = sqs_client.receive_message(QueueUrl=events)
+    for message in sqs_response["Messages"]:
+        assert json.loads(message["Body"])["detail"]["send_to_group_id"] == "group-id2"
 
 
 def test_group_not_found_summary_not_sent(events, group_db):

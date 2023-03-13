@@ -21,6 +21,11 @@ def handler(event, context: LambdaContext):
         if group.requires_daily_summary != SummaryStatus.NONE:
             detail = asdict(summary)
             detail["send_to"] = group.requires_daily_summary.value
+            detail["send_to_group_id"] = (
+                group.send_summary_to_group_id
+                if "send_summary_to_group_id" in group.attribute_values
+                else None
+            )
             client.send_message(
                 detail_type=DetailType.SUMMARY, source=Source.CHATGPT, detail=detail
             )

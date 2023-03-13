@@ -29,25 +29,22 @@ class StaticWeb(Stack):
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        domain = get_cf_output(f"BackendURL-{os.environ.get('USER', 'NoUser')}")
+        suffix = os.environ.get("USER", "NoUser")
+        domain = get_cf_output(f"BackendURL-{suffix}")
 
         destination_bucket = s3.Bucket.from_bucket_arn(
             self,
             "DestinationBucket",
-            bucket_arn=Fn.import_value(
-                f"WebBucketArn-{os.environ.get('USER', 'NoUser')}"
-            ),
+            bucket_arn=Fn.import_value(f"WebBucketArn-{suffix}"),
         )
         distribution = cloudfront.Distribution.from_distribution_attributes(
             self,
             "Distribution",
-            distribution_id=Fn.import_value(
-                f"DashboardDistributionId-{os.environ.get('USER', 'NoUser')}"
-            ),
+            distribution_id=Fn.import_value(f"DashboardDistributionId-{suffix}"),
             domain_name=urlparse(domain).netloc,
         )
 
-        static_source = self._create_static_content(domain)
+        static_source = self._create_static_content(domain, suffix)
         s3deploy.BucketDeployment(
             self,
             "DeployWebsite",
@@ -57,9 +54,9 @@ class StaticWeb(Stack):
             distribution_paths=["/*"],
         )
 
-    def _create_static_content(self, domain: str) -> str:
+    def _create_static_content(self, domain: str, suffix: str) -> str:
         build_path = "../../.build"
-        destination = f"{build_path}/static_web"
+        destination = f"{build_path}/static_web-{suffix}"
 
         if os.path.exists(destination):
             shutil.rmtree(destination)
