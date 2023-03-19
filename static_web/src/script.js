@@ -216,6 +216,8 @@ async function pullGroups() {
         }
         if (selectedValue !== "None") {
           $languageDropDown.show();
+        } else {
+          $languageDropDown.hide();
         }
       });
 
