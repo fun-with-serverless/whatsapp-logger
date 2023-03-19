@@ -10,6 +10,8 @@ from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from aws_lambda_powertools.utilities import parameters
 
+from ....utils.db_models.whatsapp_groups import SummaryLanguage, WhatsAppGroup
+
 from ...utils.models import ChatGPTSummary
 
 if TYPE_CHECKING:
@@ -33,13 +35,21 @@ def handler(event, context: LambdaContext):
         .decode("utf-8")
     )
     summary = json.loads(content)
+    language = SummaryLanguage.ENGLISH.value
+    try:
+        language = WhatsAppGroup.get(summary["group_id"]).summary_language.value
+    except WhatsAppGroup.DoesNotExist:
+        logger.info("Missing group id. Using default.", group_id=summary["group_id"])
     response = chatgpt.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
+            {
+                "role": "system",
+                "content": f"You are a helpful assistant.",
+            },
             {
                 "role": "user",
-                "content": f"The text is a conversation in a forum where people are discussing various topics. Summerize the following text {summary['chats'][:3940]} Divide the summery into the different topics",
+                "content": f"The text is a conversation in a forum where people are discussing various topics. Summerize the following text {summary['chats'][:3930]} Divide the summary into the different topics.Write your answers in {language}",
             },
         ],
     )

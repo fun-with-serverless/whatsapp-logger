@@ -11,7 +11,11 @@ from dacite import from_dict
 from ....utils.client import Client, DetailType, Source
 
 
-from ....utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
+from ....utils.db_models.whatsapp_groups import (
+    SummaryStatus,
+    WhatsAppGroup,
+    SummaryLanguage,
+)
 
 from ....utils.authentication import basic_authenticate
 from ....utils.db_models.application_state import ApplicationState, ClientStatus
@@ -45,6 +49,7 @@ class AdminPanelWhatsAppGroup:
     name: str
     mute: bool
     summary_status: SummaryStatus
+    summary_language: SummaryLanguage
 
 
 def enum_serializer(obj) -> str:
@@ -110,6 +115,7 @@ def get_groups():
                 name=result.name,
                 mute=result.always_mark_read,
                 summary_status=result.requires_daily_summary,
+                summary_language=result.summary_language,
             )
         )
         for result in results
@@ -126,13 +132,22 @@ def update_group(group_id: str):
     try:
         group = WhatsAppGroup.get(group_id)
         update_details = json.loads(app.current_event.body)
-        group.update(
-            actions=[
-                WhatsAppGroup.requires_daily_summary.set(
-                    SummaryStatus.from_str(update_details["summary_status"])
-                )
-            ]
-        )
+        if "summary_status" in update_details:
+            group.update(
+                actions=[
+                    WhatsAppGroup.requires_daily_summary.set(
+                        SummaryStatus.from_str(update_details["summary_status"])
+                    )
+                ]
+            )
+        if "summary_language" in update_details:
+            group.update(
+                actions=[
+                    WhatsAppGroup.summary_language.set(
+                        SummaryLanguage.from_str(update_details["summary_language"])
+                    )
+                ]
+            )
     except WhatsAppGroup.DoesNotExist:
         return Response(404)
 
