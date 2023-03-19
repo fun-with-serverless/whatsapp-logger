@@ -45,7 +45,7 @@ def handler(event, context: LambdaContext):
         messages=[
             {
                 "role": "system",
-                "content": f"You are a helpful assistant.",
+                "content": "You are a helpful assistant.",
             },
             {
                 "role": "user",
