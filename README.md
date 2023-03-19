@@ -39,6 +39,9 @@ In the future, we will provide access to any media shared in the group, such as 
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
+    <li>
+      <a href="#usage">Usage</a>
+    </li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -150,6 +153,28 @@ Here’s how to get one:
 * You are good to go. See your spreadsheet gets updated.
 
 ![image](https://user-images.githubusercontent.com/110536677/224486661-90f4ddd4-94be-4b37-a1c3-561924fb7dc7.png)
+
+## Usage
+After configuring the OpenAI and WhatsApp integration, the application will begin to collect a list of available groups associated with your WhatsApp account. These available groups can be viewed under the Groups Configuration tab, as shown in the image below:![image](https://user-images.githubusercontent.com/110536677/226162191-2480bfd4-465c-46f9-ba99-3b6eb29a2840.png)
+
+For each group, you have the option to define whether you want it to be summarized and, if so, where you want the summary to be sent. You have three options to choose from:
+* Myself - The summary messages will be sent to your own chat. This is a good option if you want to keep the summary private. ![image](https://user-images.githubusercontent.com/110536677/226162322-bf763d65-79ae-4a0d-91cf-e27cd3922669.png).
+* Original Group - The summary will be written in the original group where the discussion occurred.
+* None - This option will stop the daily summary for that specific group. This is the default for all new groups.
+
+Once you've chosen where to send the summary, you can select the language in which the summary will be written. Currently, the application supports eight languages:
+* English - the default
+* Hebrew
+* Mandarin Chinese
+* Spanish
+* Hindi
+* Arabic
+* French
+* German
+
+![image](https://user-images.githubusercontent.com/110536677/226162512-837f0eaf-8f43-4bbc-881f-16b81f10abf0.png)
+
+
 
 ## Contributing
 
