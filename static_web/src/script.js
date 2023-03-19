@@ -219,27 +219,6 @@ async function pullGroups() {
         }
       });
 
-      $dropdown.on("change", function () {
-        const selectedValue = $(this).val();
-        getRequest({
-          verb: "PUT",
-          url: endPointURL + `groups/${item.group_id}`,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ summary_status: selectedValue }),
-        });
-        if (selectedValue === "Other") {
-          alert(
-            "Other mode is not fully supported. Choose a different summary mode"
-          );
-        }
-        if (selectedValue !== "None") {
-          $languageDropDown.show();
-        } else {
-          $languageDropDown.hide();
-        }
-      });
 
       $languageDropDown.on("change", function () {
         const selectedValue = $(this).val();
