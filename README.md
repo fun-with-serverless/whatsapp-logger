@@ -181,9 +181,9 @@ Once you've chosen where to send the summary, you can select the language in whi
 The Serverless components in use, such as Lambda, DynamoDB, and SQS, are very inexpensive and are fully covered under the free tier. 
 The only elements that cost money are a NAT instance and a single Fargate instance. 
 * A t3.micro NAT instance costs around $7.4 per month, 
-* while a Fargate instance with 0.5 vCPU and 1GB of memory costs approximately $17.7 per month. Using an ARM architecture and 0.25 vCPU may result in some savings for the Fargate instance. 
+* while a Fargate instance with 0.25 vCPU and 1GB of memory costs approximately $10.4 per month. Using an ARM architecture may result in some savings for the Fargate instance. 
 
-**Overall, the total monthly cost is approximately $25.1.**
+**Overall, the total monthly cost is approximately $17.8.**
 
 ## Contributing
 
