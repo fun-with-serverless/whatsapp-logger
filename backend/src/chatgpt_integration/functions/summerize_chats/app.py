@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Dict, List
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
+from ....utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
+
 from ....utils.chats_data_lake import AggregatedGroup, ChatsDataLake
 
 from ...utils.consts import SUMMARY_PREFIX
@@ -35,22 +37,37 @@ def _collect_chats(lake: ChatsDataLake) -> Dict[str, AggregatedGroup]:
 
 def _write_to_s3(groups: Dict[str, AggregatedGroup], bucket: Bucket) -> List[dict]:
     files_to_return: List[dict] = []
-    for group in groups:
+    for group_id, group in groups.items():
+        try:
+            db_group = WhatsAppGroup.get(group.group_id)
+            if db_group.requires_daily_summary == SummaryStatus.NONE:
+                logger.debug(
+                    "No need to summarize",
+                    group_id=group.group_id,
+                    group_name=group.group_name,
+                )
+                continue
+        except WhatsAppGroup.DoesNotExist:
+            logger.warning(
+                "Group not found. No need to summarize",
+                group_id=group.group_id,
+                group_name=group.group_name,
+            )
+            continue
+
         group_dict = {
-            "group_name": groups[group].group_name,
-            "group_id": groups[group].group_id,
+            "group_name": group.group_name,
+            "group_id": group.group_id,
             "chats": "",
         }
 
-        sorted_chats = sorted(groups[group].chats, key=lambda val: val.time_of_chat)
+        sorted_chats = sorted(group.chats, key=lambda val: val.time_of_chat)
         chats_str = "\n".join(
             [f"{chat.participant_name} said {chat.message}" for chat in sorted_chats]
         )
 
         group_dict["chats"] = chats_str
-        file_name = f"{groups[group].group_id}-{groups[group].group_name}.json".replace(
-            "/", "_"
-        )
+        file_name = f"{group.group_id}-{group.group_name}.json".replace("/", "_")
         # Convert the group dictionary to a JSON string and write to S3
         file_name = f"{SUMMARY_PREFIX}/{file_name}"
         file_content = json.dumps(group_dict)

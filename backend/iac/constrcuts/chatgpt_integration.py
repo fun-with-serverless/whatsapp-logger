@@ -66,6 +66,7 @@ class ChatGPTIntegration(Construct):
             layers=[layer],
             environment={
                 "CHATS_BUCKET": chats_bucket.bucket_name,
+                "WHATSAPP_GROUP_TABLE_NAME": groups_db.table_name,
             },
         )
 
@@ -80,6 +81,7 @@ class ChatGPTIntegration(Construct):
             environment={
                 "OPENAI_KEY": chatgpt_key.secret_name,
                 "CHATS_BUCKET": chats_bucket.bucket_name,
+                "WHATSAPP_GROUP_TABLE_NAME": groups_db.table_name,
             },
         )
 
@@ -141,6 +143,8 @@ class ChatGPTIntegration(Construct):
         chats_bucket.grant_read(chatgpt_call)
         event_bus.grant_put_events_to(send_to_client)
         groups_db.grant_read_data(send_to_client)
+        groups_db.grant_read_data(chatgpt_call)
+        groups_db.grant_read_data(summerize_chats)
 
         SnsSqsConnection(self, "WriteToS3", whatsapp_messages, write_chats_to_s3)
 
@@ -163,6 +167,8 @@ class ChatGPTIntegration(Construct):
             lambda_function=chatgpt_call,
             output_path="$.Payload",
         )
+
+        send_to_chatgpt.add_retry(errors=["Lambda.Unknown"])
 
         delete_and_backup_step = sfn_tasks.LambdaInvoke(
             self,

@@ -1,4 +1,8 @@
-from backend.src.utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
+from backend.src.utils.db_models.whatsapp_groups import (
+    SummaryLanguage,
+    SummaryStatus,
+    WhatsAppGroup,
+)
 from ...src.admin_panel.functions.configuration.app import handler
 from unittest.mock import MagicMock
 import json
@@ -132,3 +136,26 @@ def test_get_groups(basic_auth, group_db, secret_manager):
     response = handler(request, MagicMock())
     assert json.loads(response["body"])["groups"][0]["group_id"] == "group-id"
     assert json.loads(response["body"])["groups"][0]["summary_status"] == "Myself"
+
+
+def test_update_group(basic_auth, group_db, secret_manager):
+    request = http_request(
+        path="/groups/group-id",
+        method="PUT",
+        body=json.dumps(
+            {
+                "summary_status": "Original_Group",
+                "summary_language": "Hebrew",
+            }
+        ),
+    )
+    WhatsAppGroup(
+        "group-id", name="name", requires_daily_summary=SummaryStatus.MYSELF
+    ).save()
+
+    request["headers"]["Authorization"] = basic_auth
+
+    handler(request, MagicMock())
+    group = WhatsAppGroup.get("group-id")
+    assert group.requires_daily_summary == SummaryStatus.ORIGINAL_GROUP
+    assert group.summary_language == SummaryLanguage.HEBREW
