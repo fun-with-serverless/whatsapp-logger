@@ -84,7 +84,7 @@ class WhatsAppListener(Stack):
     ) -> None:
         cluster = ecs.Cluster(self, "Cluster", vpc=vpc)
         fargate_task_definition = ecs.FargateTaskDefinition(
-            self, "TaskDef", memory_limit_mib=1024, cpu=512
+            self, "TaskDef", memory_limit_mib=1024, cpu=256
         )
         whatsapp_listener_container = fargate_task_definition.add_container(
             "Container",
