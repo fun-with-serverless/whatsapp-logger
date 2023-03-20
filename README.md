@@ -15,7 +15,7 @@ With this application, new members can easily review previous discussions, even 
 
 In the future, we will provide access to any media shared in the group, such as images, videos, and audio clips. With these features, you will have all the information you need at your fingertips, making it easier than ever to stay connected with your WhatsApp groups.
     </p>
-<img src="https://user-images.githubusercontent.com/110536677/217352491-ad533419-45db-4c30-ba28-ed3a843e7fa3.png">
+    <img src="https://user-images.githubusercontent.com/110536677/226422476-7d097813-a0c8-4c74-95a1-f9cfeae1f5ef.png" width="75%" height="75%">
     <br />
     <br />
     <a href="https://github.com/aws-hebrew-book/reminders/issues">Report Bug</a>
@@ -109,6 +109,8 @@ This architecture consists of several AWS components that work together to allow
 * You can choose per group where do you want the summary to be written at.
 
 ### Setting up Google
+![image](https://user-images.githubusercontent.com/110536677/217352491-ad533419-45db-4c30-ba28-ed3a843e7fa3.png)
+
 * Create a new spreadsheet in google sheet.
 * In case you want to save yur whatsapp chats into google sheets, you need to configure a google cloud account.
 * Head to [Google Developers Console](https://console.cloud.google.com/apis/dashboard?project=serverless-demo-210412) and create a new project (or select the one you already have).
