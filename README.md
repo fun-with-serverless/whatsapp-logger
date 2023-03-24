@@ -205,10 +205,10 @@ To run this application locally, you need to provision several resources in your
 * Copy `.env-example` to a new file named `.env`.
 * Deploy the entire application using `poetry poe deploy`.
 * After a successful deployment, you will see the following items as output:
-** SQSEVENTURL
-** WHATAPPSNSTOPICARN
-** QRBUCKETNAME
-** EVENTBRIDGEARN
+* * SQSEVENTURL
+* * WHATAPPSNSTOPICARN
+* * QRBUCKETNAME
+* * EVENTBRIDGEARN
 * Copy these values to the relevant fields in `.env`.
 * From the root directory, run `./scripts/run_whatsapp_listener_locally.sh`.
 
