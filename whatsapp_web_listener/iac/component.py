@@ -10,6 +10,7 @@ from aws_cdk import (
     aws_events as eb,
     aws_sqs as sqs,
     aws_events_targets as events_targets,
+    CfnOutput,
 )
 from constructs import Construct
 
@@ -40,6 +41,12 @@ class WhatsAppListener(Stack):
             file_system=file_system,
             sqs_target=sqs_target,
             event_bus=event_bus,
+        )
+
+        CfnOutput(
+            self,
+            "SQS_EVENT_URL",
+            value=sqs_target.queue_url,
         )
 
     def _define_eventbus_events(self, event_bus: eb.EventBus) -> sqs.Queue:

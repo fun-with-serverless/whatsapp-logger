@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Used by whatsapp-web-listener project to run the container locally. Don't run this script directly, instead use "npm run run-local"
 # Extract the credentials from the file
@@ -9,5 +10,5 @@ secret_key=$(grep aws_secret_access_key ~/.aws/credentials | awk -F " = " '{prin
 AWS_ACCESS_KEY_ID=$access_key
 AWS_SECRET_ACCESS_KEY=$secret_key
 
-docker build -t whatsapp-web-listener .
-docker run --env-file ./src/.env -e AWS_REGION=us-east-1 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY  whatsapp-web-listener
+docker build -t whatsapp-web-listener whatsapp_web_listener/
+docker run --env-file ./whatsapp_web_listener/.env -e AWS_REGION=us-east-1 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY  whatsapp-web-listener

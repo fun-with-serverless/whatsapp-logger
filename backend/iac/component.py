@@ -125,3 +125,18 @@ class Backend(Stack):
             export_name=f"BackendURL-{os.environ.get('USER', 'NoUser')}",
             value=admin.lambda_url,
         )
+        CfnOutput(
+            self,
+            "EVENTBRIDGE_ARN",
+            value=self._event_bus.event_bus_arn,
+        )
+        CfnOutput(
+            self,
+            "QR_BUCKET_NAME",
+            value=self._state.qr_bucket.bucket_name,
+        )
+        CfnOutput(
+            self,
+            "WHATAPP_SNS_TOPIC_ARN",
+            value=self._whatsapp_message_sns.topic_arn,
+        )
