@@ -100,6 +100,13 @@ class WhatsAppClient {
       pino.info(message.from)
       const chat = await message.getChat()
       const contact = await message.getContact()
+      let quotedMessage = null
+      let quotedMessageContact = null
+      if (message.hasQuotedMsg) {
+        quotedMessage = await message.getQuotedMessage()
+        quotedMessageContact = await quotedMessage.getContact()
+      }
+
       message = {
         group_name: chat.name,
         group_id: chat.id.user,
@@ -109,7 +116,9 @@ class WhatsAppClient {
         participant_number: contact.number,
         participant_contact_name: contact.name,
         message: message.body,
-        has_media: message.hasMedia
+        has_media: message.hasMedia,
+        quoted_message: quotedMessage.body,
+        quoted_message_participant_id: quotedMessageContact.id.user
       }
       pino.info(chat.id)
       pino.info(message)
