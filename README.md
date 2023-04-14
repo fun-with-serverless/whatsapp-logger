@@ -4,7 +4,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img width="256" height="256" src="https://user-images.githubusercontent.com/110536677/216813972-ea76373f-bfaa-4875-bdfa-5c93bd91acb7.png" alt="A 3d art showing whatsapp application turning into small water drops that fall">
+    <img width="256" height="256" src="https://user-images.githubusercontent.com/110536677/232124583-281bd974-7b3d-4dba-91e5-cce0bbeef924.png" alt="A 3d art showing whatsapp application turning into small water drops that fall">
+
 
 <h3 align="center">WhatsApp Group Manager</h3>
 
