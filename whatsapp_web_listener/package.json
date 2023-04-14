@@ -33,7 +33,7 @@
     "qrcode": "^1.5.1",
     "randomstring": "^1.2.3",
     "set-interval-async": "^3.0.3",
-    "whatsapp-web.js": "^1.19.4"
+    "whatsapp-web.js": "^1.19.5"
   },
   "devDependencies": {
     "eslint": "^8.31.0",
