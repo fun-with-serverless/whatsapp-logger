@@ -189,6 +189,9 @@ def s3_raw_lake(bucket_name_env, request):
             participant_handle="Efi",
             participant_number="123456",
             has_media=False,
+            quoted_message="Hello",
+            quoted_message_participant_contact_name=None,
+            quoted_message_participant_handle="Anat",
         )
 
         conn.put_object(

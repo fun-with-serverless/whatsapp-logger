@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import functools
 import os
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 import boto3
 from typing import Dict
 
@@ -24,6 +24,7 @@ class AggregatedChat:
     participant_name: str
     time_of_chat: datetime
     message: str
+    quoted: Optional[str] = None
 
 
 @dataclass
@@ -47,7 +48,10 @@ class ChatsDataLake:
             for line in file_content.splitlines():
                 message: WhatsAppMessage = WhatsAppMessage.from_json(line)
                 chat = AggregatedChat(
-                    message.participant_name, message.time, message=message.message
+                    message.participant_name,
+                    message.time,
+                    message=message.message,
+                    quoted=message.quoted_message_participant_name,
                 )
                 key = f"{message.group_id}-{message.group_name}"
                 groups[key].chats.append(chat)

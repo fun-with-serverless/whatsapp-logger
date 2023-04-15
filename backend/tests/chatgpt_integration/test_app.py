@@ -23,7 +23,7 @@ def test_successful_chatgpt_summerize_creation(s3_raw_lake, group_db):
 
     assert (
         content
-        == '{"group_name": "test", "group_id": "group-id", "chats": "Efi said Hello\\nEfi said Hi"}'
+        == '{"group_name": "test", "group_id": "group-id", "chats": "Efi said Hello\\nEfi replied to Anat with Hi"}'
     )
 
 
