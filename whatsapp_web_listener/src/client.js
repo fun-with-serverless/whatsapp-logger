@@ -6,12 +6,13 @@ const { getEnv, sendStatusUpdate } = require('./utils')
 const pino = require('pino')()
 
 class WhatsAppClient {
-  constructor ({ sns, s3, eventbridge }) {
+  constructor ({ sns, s3, eventbridge, eventBridgeArn }) {
     this.intervalId = null
 
     this.sns = sns
     this.s3 = s3
     this.eventbridge = eventbridge
+    this.eventBridgeArn = eventBridgeArn
   }
 
   async startListening () {
@@ -19,7 +20,6 @@ class WhatsAppClient {
     this.sendMessageToSNSARN = getEnv('WHATAPP_SNS_TOPIC_ARN')
     this.efsPath = getEnv('PERSISTANCE_STORAGE_MOUNT_POINT')
     this.efsCache = `${this.efsPath}/local_auth`
-    this.eventBridgeArn = getEnv('EVENTBRIDGE_ARN')
 
     try {
       await fs.ensureDir(this.efsCache, 775)
