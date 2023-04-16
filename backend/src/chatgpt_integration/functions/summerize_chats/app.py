@@ -8,7 +8,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 
 from ....utils.db_models.whatsapp_groups import SummaryStatus, WhatsAppGroup
 
-from ....utils.chats_data_lake import AggregatedGroup, ChatsDataLake
+from ....utils.chats_data_lake import AggregatedChat, AggregatedGroup, ChatsDataLake
 
 from ...utils.consts import SUMMARY_PREFIX
 
@@ -62,9 +62,14 @@ def _write_to_s3(groups: Dict[str, AggregatedGroup], bucket: Bucket) -> List[dic
         }
 
         sorted_chats = sorted(group.chats, key=lambda val: val.time_of_chat)
-        chats_str = "\n".join(
-            [f"{chat.participant_name} said {chat.message}" for chat in sorted_chats]
-        )
+
+        def create_summary(chat: AggregatedChat):
+            if chat.quoted:
+                return f"{chat.participant_name} replied to {chat.quoted} with {chat.message}"
+
+            return f"{chat.participant_name} said {chat.message}"
+
+        chats_str = "\n".join(map(create_summary, sorted_chats))
 
         group_dict["chats"] = chats_str
         file_name = f"{group.group_id}-{group.group_name}.json".replace("/", "_")

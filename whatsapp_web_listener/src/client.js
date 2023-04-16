@@ -6,12 +6,13 @@ const { getEnv, sendStatusUpdate } = require('./utils')
 const pino = require('pino')()
 
 class WhatsAppClient {
-  constructor ({ sns, s3, eventbridge }) {
+  constructor ({ sns, s3, eventbridge, eventBridgeArn }) {
     this.intervalId = null
 
     this.sns = sns
     this.s3 = s3
     this.eventbridge = eventbridge
+    this.eventBridgeArn = eventBridgeArn
   }
 
   async startListening () {
@@ -19,7 +20,6 @@ class WhatsAppClient {
     this.sendMessageToSNSARN = getEnv('WHATAPP_SNS_TOPIC_ARN')
     this.efsPath = getEnv('PERSISTANCE_STORAGE_MOUNT_POINT')
     this.efsCache = `${this.efsPath}/local_auth`
-    this.eventBridgeArn = getEnv('EVENTBRIDGE_ARN')
 
     try {
       await fs.ensureDir(this.efsCache, 775)
@@ -100,6 +100,17 @@ class WhatsAppClient {
       pino.info(message.from)
       const chat = await message.getChat()
       const contact = await message.getContact()
+      let quotedMessage = null
+      let quotedMessageContactName = null
+      let quotedParticipantHandle = null
+      if (message.hasQuotedMsg) {
+        const quotedMessageObj = await message.getQuotedMessage()
+        const quotedContact = await quotedMessageObj.getContact()
+        quotedMessage = quotedMessageObj.body
+        quotedMessageContactName = quotedContact.name
+        quotedParticipantHandle = quotedContact.pushname
+      }
+
       message = {
         group_name: chat.name,
         group_id: chat.id.user,
@@ -109,7 +120,10 @@ class WhatsAppClient {
         participant_number: contact.number,
         participant_contact_name: contact.name,
         message: message.body,
-        has_media: message.hasMedia
+        has_media: message.hasMedia,
+        quoted_message: quotedMessage,
+        quoted_message_participant_contact_name: quotedMessageContactName,
+        quoted_message_participant_handle: quotedParticipantHandle
       }
       pino.info(chat.id)
       pino.info(message)

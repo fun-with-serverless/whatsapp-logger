@@ -17,6 +17,9 @@ class WhatsAppMessage:
     participant_number: str
     has_media: bool
     participant_contact_name: Optional[str] = field(default="Unknown")
+    quoted_message: Optional[str] = field(default=None)
+    quoted_message_participant_contact_name: Optional[str] = field(default=None)
+    quoted_message_participant_handle: Optional[str] = field(default=None)
 
     @property
     def participant_name(self) -> str:
@@ -25,6 +28,15 @@ class WhatsAppMessage:
             if self.participant_contact_name
             and self.participant_contact_name != "Unknown"
             else self.participant_handle
+        )
+
+    @property
+    def quoted_message_participant_name(self) -> Optional[str]:
+        return (
+            self.quoted_message_participant_contact_name
+            if self.quoted_message_participant_contact_name
+            and self.quoted_message_participant_contact_name is not None
+            else self.quoted_message_participant_handle
         )
 
     @staticmethod
