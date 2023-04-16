@@ -1,4 +1,9 @@
 const pino = require('pino')()
+const {
+  ReceiveMessageCommand,
+  DeleteMessageCommand
+} = require('@aws-sdk/client-sqs')
+const { PutEventsCommand } = require('@aws-sdk/client-eventbridge')
 
 function getEnv (name) {
   const env = process.env[name]
@@ -31,14 +36,13 @@ function getEnvOrDefault (name, defaultValue) {
 const pollQueue = async (queueUrl, sqsClient, eventsExecuter) => {
   pino.info('Polling queue...')
   try {
-    const receiveMessageResponse = await sqsClient
-      .receiveMessage({
-        QueueUrl: queueUrl,
-        MaxNumberOfMessages: 1,
-        WaitTimeSeconds: 20,
-        VisibilityTimeout: 20
-      })
-      .promise()
+    const receiveMessageCommand = new ReceiveMessageCommand({
+      QueueUrl: queueUrl,
+      MaxNumberOfMessages: 1,
+      WaitTimeSeconds: 20,
+      VisibilityTimeout: 20
+    })
+    const receiveMessageResponse = await sqsClient.send(receiveMessageCommand)
 
     if (receiveMessageResponse.Messages) {
       receiveMessageResponse.Messages.forEach(async (message) => {
@@ -46,12 +50,11 @@ const pollQueue = async (queueUrl, sqsClient, eventsExecuter) => {
         const body = JSON.parse(message.Body)
         pino.info(body)
         eventsExecuter.handle(body)
-        await sqsClient
-          .deleteMessage({
-            QueueUrl: queueUrl,
-            ReceiptHandle: message.ReceiptHandle
-          })
-          .promise()
+        const deleteMessageCommand = new DeleteMessageCommand({
+          QueueUrl: queueUrl,
+          ReceiptHandle: message.ReceiptHandle
+        })
+        await sqsClient.send(deleteMessageCommand)
       })
     }
   } catch (err) {
@@ -77,18 +80,17 @@ const sendStatusUpdate = async ({
   eventbridgeArn,
   detailsType
 }) => {
-  await eventbridge
-    .putEvents({
-      Entries: [
-        {
-          EventBusName: eventbridgeArn,
-          Source: 'whatsapp-client',
-          DetailType: 'status-change',
-          Detail: JSON.stringify({ status: detailsType })
-        }
-      ]
-    })
-    .promise()
+  const command = new PutEventsCommand({
+    Entries: [
+      {
+        EventBusName: eventbridgeArn,
+        Source: 'whatsapp-client',
+        DetailType: 'status-change',
+        Detail: JSON.stringify({ status: detailsType })
+      }
+    ]
+  })
+  await eventbridge.send(command)
 }
 
 module.exports = {

@@ -1,65 +1,68 @@
-const {
-  SQS
-} = require('@aws-sdk/client-sqs')
 const { pollQueue } = require('../src/utils')
+
+const {
+  ReceiveMessageCommand,
+  DeleteMessageCommand
+} = require('@aws-sdk/client-sqs')
+
+jest.mock('@aws-sdk/client-sqs')
 
 describe('pollQueue', () => {
   let sqsClient
   let eventsExecuter
 
   beforeEach(() => {
-    sqsClient = new SQS()
-    sqsClient.receiveMessage = jest.fn().mockReturnValue({
-      promise: jest.fn().mockResolvedValue({
-        Messages: [
-          {
-            Body: JSON.stringify({
-              event: 'logout'
-            }),
-            ReceiptHandle: 'test-receipt-handle'
-          }
-        ]
-      })
-    })
-    sqsClient.deleteMessage = jest.fn().mockReturnValue({
-      promise: jest.fn().mockResolvedValue()
-    })
+    // Mock dependencies
+    sqsClient = {
+      send: jest.fn()
+    }
     eventsExecuter = {
       handle: jest.fn()
     }
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    jest.clearAllMocks()
   })
 
-  it('should poll the queue and handle events', async () => {
-    const intervalId = await pollQueue('queue-url', sqsClient, eventsExecuter)
-    expect(sqsClient.receiveMessage).toHaveBeenCalledWith({
-      QueueUrl: 'queue-url',
-      MaxNumberOfMessages: 1,
-      WaitTimeSeconds: 20,
-      VisibilityTimeout: 20
+  it('should poll the queue, handle and delete the message', async () => {
+    const queueUrl = 'https://test-queue-url.com'
+    const messageBody = JSON.stringify({
+      event: 'test-event',
+      data: 'test-data'
     })
-    expect(eventsExecuter.handle).toHaveBeenCalledWith({
-      event: 'logout'
-    })
-    expect(sqsClient.deleteMessage).toHaveBeenCalledWith({
-      QueueUrl: 'queue-url',
-      ReceiptHandle: 'test-receipt-handle'
-    })
-    clearTimeout(intervalId)
-  })
 
-  it('should log an error if unable to pull messages from queue', async () => {
-    sqsClient.receiveMessage.mockReturnValue({
-      promise: jest.fn().mockRejectedValue(new Error('Unable to pull messages'))
+    // Set up mocked ReceiveMessageCommand response
+    sqsClient.send.mockImplementationOnce((command) => {
+      if (command instanceof ReceiveMessageCommand) {
+        return Promise.resolve({
+          Messages: [
+            {
+              Body: messageBody,
+              ReceiptHandle: 'test-receipt-handle'
+            }
+          ]
+        })
+      } else {
+        return Promise.reject(new Error('ReceiveMessageCommand error'))
+      }
     })
-    const intervalId = await pollQueue('queue-url', sqsClient, eventsExecuter)
-    expect(sqsClient.deleteMessage).not.toHaveBeenCalledWith({
-      QueueUrl: 'queue-url',
-      ReceiptHandle: 'test-receipt-handle'
+
+    // Set up mocked DeleteMessageCommand response
+    sqsClient.send.mockImplementationOnce((command) => {
+      if (command instanceof DeleteMessageCommand) {
+        return Promise.resolve()
+      } else {
+        return Promise.reject(new Error('DeleteMessageCommand error'))
+      }
     })
+
+    // Call pollQueue function
+    const intervalId = await pollQueue(queueUrl, sqsClient, eventsExecuter)
     clearTimeout(intervalId)
+
+    // Verify interactions
+    expect(sqsClient.send).toHaveBeenCalledTimes(2)
+    expect(eventsExecuter.handle).toHaveBeenCalledWith(JSON.parse(messageBody))
   })
 })

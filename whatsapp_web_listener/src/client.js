@@ -1,4 +1,7 @@
+const { PutObjectCommand } = require('@aws-sdk/client-s3')
 const { Client, LocalAuth } = require('whatsapp-web.js')
+const { PublishCommand } = require('@aws-sdk/client-sns')
+
 const qrcode = require('qrcode')
 const fs = require('fs-extra')
 const { getEnv, sendStatusUpdate } = require('./utils')
@@ -65,12 +68,12 @@ class WhatsAppClient {
     })
     await qrcode.toFile('./file.png', qr, async (qrcode) => {
       const qrImageFile = fs.createReadStream('./file.png')
-      const params = {
+      const command = new PutObjectCommand({
         Bucket: this.qrBucketName,
         Key: 'qr.png',
         Body: qrImageFile
-      }
-      await this.s3.upload(params).promise()
+      })
+      await this.s3.send(command)
       pino.info('Uploaded QR code')
     })
   }
@@ -131,12 +134,12 @@ class WhatsAppClient {
       pino.info(chat.id)
       pino.info(message)
 
-      await this.sns
-        .publish({
-          TopicArn: this.sendMessageToSNSARN,
-          Message: JSON.stringify(message)
-        })
-        .promise()
+      const command = new PublishCommand({
+        TopicArn: this.sendMessageToSNSARN,
+        Message: JSON.stringify(message)
+      })
+
+      await this.sns.send(command)
     } catch (error) {
       pino.error(error)
     }
