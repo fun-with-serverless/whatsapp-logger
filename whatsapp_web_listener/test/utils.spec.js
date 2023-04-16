@@ -1,4 +1,6 @@
-const AWS = require('aws-sdk')
+const {
+  SQS
+} = require('@aws-sdk/client-sqs')
 const { pollQueue } = require('../src/utils')
 
 describe('pollQueue', () => {
@@ -6,7 +8,7 @@ describe('pollQueue', () => {
   let eventsExecuter
 
   beforeEach(() => {
-    sqsClient = new AWS.SQS()
+    sqsClient = new SQS()
     sqsClient.receiveMessage = jest.fn().mockReturnValue({
       promise: jest.fn().mockResolvedValue({
         Messages: [
