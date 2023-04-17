@@ -4,24 +4,26 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <img width="256" height="256" src="https://user-images.githubusercontent.com/110536677/232124583-281bd974-7b3d-4dba-91e5-cce0bbeef924.png" alt="A 3d art showing whatsapp application turning into small water drops that fall">
+    <img width="256" height="256" src="https://user-images.githubusercontent.com/110536677/232124583-281bd974-7b3d-4dba-91e5-cce0bbeef924.png" alt="A 3d art showing whatsapp application turning into small water drops that fall"></div>
 
 
 <h3 align="center">WhatsApp Group Manager</h3>
 
-  <p align="center">
+  <p align="justify">
    Introducing a new application that helps you keep track of your WhatsApp group discussions. If you have several WhatsApp groups, you may sometimes find it challenging to keep up with the conversations and discussions, especially if you are a new member. This application solves this problem by saving the content of your WhatsApp groups in a Google Sheet and to create a daily summary of the conversations using ChatGPT.
 
 With this application, new members can easily review previous discussions, even if they weren't a part of the group when the discussions took place. The Google Sheet acts as a database of all the discussions, allowing new members to search for relevant information using keywords or specific dates.
 
 In the future, we will provide access to any media shared in the group, such as images, videos, and audio clips. With these features, you will have all the information you need at your fingertips, making it easier than ever to stay connected with your WhatsApp groups.
     </p>
+    <div align="center">
     <img src="https://user-images.githubusercontent.com/110536677/226422476-7d097813-a0c8-4c74-95a1-f9cfeae1f5ef.png" width="75%" height="75%">
     <br />
     <br />
     <a href="https://github.com/aws-hebrew-book/reminders/issues">Report Bug</a>
     ·
     <a href="https://github.com/aws-hebrew-book/reminders/issues">Request Feature</a>
+    </div>
   </p>
 </div>
 
