@@ -12,6 +12,8 @@ from aws_cdk import (
     aws_secretsmanager as secretmanager,
 )
 
+from .predefined_lambda import PythonLambda
+
 
 class AdminPanel(Construct):
     @property
@@ -34,10 +36,9 @@ class AdminPanel(Construct):
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
-        qr_lambda = lambda_python.PythonFunction(
+        qr_lambda = PythonLambda(
             self,
             "Admin",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/admin_panel/functions/configuration/app.py",
             timeout=Duration.seconds(30),
@@ -57,10 +58,9 @@ class AdminPanel(Construct):
 
         status_dlq = sqs.Queue(self, "StatusDLQ")
 
-        agent_status = lambda_python.PythonFunction(
+        agent_status = PythonLambda(
             self,
             "UpdateStatus",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/admin_panel/functions/agent_status/app.py",
             timeout=Duration.seconds(30),

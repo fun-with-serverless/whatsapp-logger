@@ -43,5 +43,5 @@ def prepare_layer(
         stack,
         layer_name,
         entry=path,
-        compatible_runtimes=[_lambda.Runtime.PYTHON_3_9],
+        compatible_runtimes=[_lambda.Runtime.PYTHON_3_10],
     )

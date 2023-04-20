@@ -3,11 +3,11 @@ from .sns_sqs import SnsSqsConnection
 from aws_cdk import (
     aws_sns as sns,
     aws_lambda_python_alpha as lambda_python,
-    aws_lambda as _lambda,
     Duration,
     aws_ssm as ssm,
     aws_secretsmanager as secretmanager,
 )
+from .predefined_lambda import PythonLambda
 
 
 class GoogleSheetsRecorder(Construct):
@@ -22,10 +22,9 @@ class GoogleSheetsRecorder(Construct):
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        sheets_recorder = lambda_python.PythonFunction(
+        sheets_recorder = PythonLambda(
             self,
             "GoogleSheetRecorder",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/googlesheets_recorder/app.py",
             timeout=Duration.minutes(1),

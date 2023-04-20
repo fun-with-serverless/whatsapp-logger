@@ -1,7 +1,6 @@
 from constructs import Construct
 from aws_cdk import (
     aws_lambda_python_alpha as lambda_python,
-    aws_lambda as _lambda,
     Duration,
     aws_s3 as s3,
     aws_sns as sns,
@@ -17,6 +16,7 @@ from aws_cdk import (
 )
 
 from .sns_sqs import SnsSqsConnection
+from .predefined_lambda import PythonLambda
 
 
 class ChatGPTIntegration(Construct):
@@ -43,10 +43,9 @@ class ChatGPTIntegration(Construct):
 
         ds = fh.DeliveryStream(self, "Delivery Stream", destinations=[s3_destination])
 
-        write_chats_to_s3 = lambda_python.PythonFunction(
+        write_chats_to_s3 = PythonLambda(
             self,
             "ChatGPTIntegration",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/chatgpt_integration/functions/write_chats_to_s3/app.py",
             timeout=Duration.seconds(30),
@@ -56,10 +55,9 @@ class ChatGPTIntegration(Construct):
             },
         )
 
-        summerize_chats = lambda_python.PythonFunction(
+        summerize_chats = PythonLambda(
             self,
             "SummerizeChats",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/chatgpt_integration/functions/summerize_chats/app.py",
             timeout=Duration.seconds(120),
@@ -70,10 +68,9 @@ class ChatGPTIntegration(Construct):
             },
         )
 
-        chatgpt_call = lambda_python.PythonFunction(
+        chatgpt_call = PythonLambda(
             self,
             "ChatGPTCall",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/chatgpt_integration/functions/chatgpt_call/app.py",
             timeout=Duration.seconds(60),
@@ -85,10 +82,9 @@ class ChatGPTIntegration(Construct):
             },
         )
 
-        delete_buckup = lambda_python.PythonFunction(
+        delete_buckup = PythonLambda(
             self,
             "DeleteOldChats",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/chatgpt_integration/functions/delete_old_summary/app.py",
             timeout=Duration.seconds(60),
@@ -98,10 +94,9 @@ class ChatGPTIntegration(Construct):
             },
         )
 
-        send_to_client = lambda_python.PythonFunction(
+        send_to_client = PythonLambda(
             self,
             "SendSummaryToClient",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/chatgpt_integration/functions/send_summary_to_client/app.py",
             timeout=Duration.seconds(30),
