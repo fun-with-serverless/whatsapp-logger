@@ -1,13 +1,13 @@
 from constructs import Construct
 from aws_cdk import (
     aws_lambda_python_alpha as lambda_python,
-    aws_lambda as _lambda,
     Duration,
     aws_dynamodb as dynamodb,
     aws_sns as sns,
 )
 
 from .sns_sqs import SnsSqsConnection
+from .predefined_lambda import PythonLambda
 
 
 class MessageStatistics(Construct):
@@ -21,10 +21,9 @@ class MessageStatistics(Construct):
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
-        message_statistics = lambda_python.PythonFunction(
+        message_statistics = PythonLambda(
             self,
             "MessageStatistics",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/admin_panel/functions/messages_statistics/app.py",
             timeout=Duration.seconds(30),

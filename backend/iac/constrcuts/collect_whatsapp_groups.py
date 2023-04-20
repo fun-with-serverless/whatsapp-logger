@@ -1,13 +1,14 @@
 from constructs import Construct
 from aws_cdk import (
     aws_lambda_python_alpha as lambda_python,
-    aws_lambda as _lambda,
     Duration,
     aws_dynamodb as dynamodb,
     aws_events as events,
     aws_events_targets as targets,
     aws_s3 as s3,
 )
+
+from .predefined_lambda import PythonLambda
 
 
 class CollectWhatsAppGroups(Construct):
@@ -21,10 +22,9 @@ class CollectWhatsAppGroups(Construct):
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
-        collect_lambda = lambda_python.PythonFunction(
+        collect_lambda = PythonLambda(
             self,
             "CollectWhatsAppGroups",
-            runtime=_lambda.Runtime.PYTHON_3_9,
             entry="backend",
             index="src/groups_collector/app.py",
             timeout=Duration.seconds(60),

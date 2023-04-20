@@ -79,7 +79,7 @@ This architecture consists of several AWS components that work together to allow
 ### Prerequisites
 * Make sure to have the [latest CDK version installed](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_install) (V2).
 * An AWS enviornment.
-* Python 3.9 (I highly recommend using [pyenv](https://github.com/pyenv/pyenv#installation)).
+* Python 3.10 (I highly recommend using [pyenv](https://github.com/pyenv/pyenv#installation)).
 * [Python Poetry](https://python-poetry.org/docs/#installation)
 * Add [Poe the Poet](https://github.com/nat-n/poethepoet) to Poetry by running `poetry self add 'poethepoet[poetry_plugin]'`
 
