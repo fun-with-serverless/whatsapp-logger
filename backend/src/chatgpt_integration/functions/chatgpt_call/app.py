@@ -3,7 +3,7 @@ from dataclasses import asdict
 import functools
 import json
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import boto3
 import openai
 import tiktoken
@@ -94,7 +94,22 @@ def _get_valid_content(content: str, language: str):
     return string_template.format(found_string, language)
 
 
-def _find_max_substring(content: str, token_function, max_tokens: int = 4000):
+def _find_max_substring(
+    content: str, token_function: Callable[[str], int], max_tokens: int = 4000
+):
+    """
+
+    This function finds the longest substring that starts from the beginning of the input string content and
+    satisfies the constraint that the number of tokens (determined by token_function) is not greater than max_tokens.
+
+    Args:
+    content (str): The input string from which the longest substring is to be found.
+    token_function (callable): A function that takes a string as input and returns the number of tokens in the string.
+    max_tokens (int, optional): The maximum number of tokens allowed in the substring. Default is 4000.
+
+    Returns:
+    str: The longest substring that starts from the beginning of the input string and has no more than max_tokens tokens.
+    """
     left, right = 0, len(content)
 
     while left < right:
