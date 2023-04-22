@@ -74,6 +74,7 @@ class ChatGPTIntegration(Construct):
             entry="backend",
             index="src/chatgpt_integration/functions/chatgpt_call/app.py",
             timeout=Duration.seconds(60),
+            memory_size=512,
             layers=[layer],
             environment={
                 "OPENAI_KEY": chatgpt_key.secret_name,

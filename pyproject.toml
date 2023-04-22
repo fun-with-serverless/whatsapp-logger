@@ -57,6 +57,7 @@ pynamodb = "^5.4.0"
 aws-lambda-powertools = {extras = ["all"], version = "^2.14.0"}
 gspread = "^5.7.2"
 openai = "^0.27.0"
+tiktoken = "^0.3.3"
 
 
 [tool.poetry.group.dev.dependencies]
