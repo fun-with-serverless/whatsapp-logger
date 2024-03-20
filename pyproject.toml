@@ -61,7 +61,7 @@ tiktoken = "^0.3.3"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.12.0"
+black = "^24.3.0"
 ruff = "^0.0.241"
 pytest = "^7.2.1"
 moto = "^4.1.2"
